@@ -1,0 +1,60 @@
+#cloud-config
+
+{% if v1.distro_release == 'focal' %}
+
+users:
+    - name: rt
+      shell: /usr/bin/bash
+      sudo: ALL=(ALL:ALL) NOPASSWD:ALL
+
+chpasswd:
+    expire: false
+
+apt_upgrade: true
+apt:
+    sources:
+        speedtest:
+            source: deb [trusted=yes] https://packagecloud.io/ookla/speedtest-cli/ubuntu focal main
+        tailscale:
+            source: deb [trusted=yes] https://pkgs.tailscale.com/stable/ubuntu focal main
+
+packages:
+    - qemu-guest-agent
+    - python3
+    - build-essential
+    - python3-pip
+    - traceroute
+    - speedtest
+    - tailscale
+    - neofetch
+    - iperf3
+    - vim
+    - screen
+    - iftop
+    - unzip
+    - whois
+    - curl
+    - file
+    - htop
+    - tree
+    - wget
+    - git
+    - mtr
+
+runcmd:
+
+    - sed -i '1i PermitRootLogin no' /etc/ssh/sshd_config
+    - sed -i '1i PasswordAuthentication no' /etc/ssh/sshd_config
+    - sed -i '1i ClientAliveInterval 5' /etc/ssh/sshd_config
+    - systemctl --no-block restart sshd
+    - sudo systemctl start fail2ban
+    - sudo systemctl enable fail2ban
+
+    - pip3 insall bpytop
+
+ssh_authorized_keys:
+    - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBD9ItEFokTDLxrbtvS3MD1ydcrbpwMXYfWV5r08FvjgYH6FkgrHrzG9/LyQ+7GFDmqcjb7DUUp1g5lMIzgY0Or0= rt@rts-MacBook-Pro.local
+    - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLT0szO1EJOO2QtsyZTbeuCPb3lxuQvdYmrlusIhrM3g5MhdFCsvcF5Ya60TXs+CPsTPJ0XJJmc32qDMljCmk54= rt@rt-desktop
+    - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOexRWaRt+sGaH/edtNHmaTGxsQQxwxw0z/5VsAos3RJ rt@DESKTOP-3U6QGH9
+
+{% endif %}
