@@ -22,7 +22,7 @@ echo "rt  ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/rt
 
 #disable root login
 echo "PermitRootLogin no" >> /etc/ssh/sshd_config 
-echo "PermitEmptyPasswords no" /etc/ssh/sshd_config
+echo "PermitEmptyPasswords no" >> /etc/ssh/sshd_config
 
 # Message of the day 
 wget https://raw.githubusercontent.com/jwandrews99/Linux-Automation/master/misc/motd.sh
