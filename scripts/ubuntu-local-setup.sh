@@ -72,6 +72,8 @@ apt-get install qemu-guest-agent -y
 systemctl enable qemu-guest-agent
 systemctl start qemu-guest-agent
 
+#TODO not taking input, just doing it
+
 # docker install
 echo "
 ######################################################################################################
