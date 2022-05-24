@@ -5,6 +5,9 @@ USER=rt
 HOME=/home/${USER}
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOexRWaRt+sGaH/edtNHmaTGxsQQxwxw0z/5VsAos3RJ rt@DESKTOP-3U6QGH9"
 
+# root
+su - root
+
 #make user and dirs
 useradd --create-home ${USER} --shell "/bin/bash"
 usermod -aG sudo ${USER}
@@ -71,38 +74,6 @@ sudo apt-get install tailscale
 apt-get install qemu-guest-agent -y
 systemctl enable qemu-guest-agent
 systemctl start qemu-guest-agent
-
-#TODO not taking input, just doing it
-
-# docker install
-echo "
-######################################################################################################
-Do you want to install docker? If so type y / If you dont want to install enter n
-######################################################################################################
-"
-read docker
-
-if [[ $docker -eq "y" ]] || [[ $docker -eq "yes" ]]; then
-    sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
-    sudo apt-get update -y
-    sudo apt-cache policy docker-ce
-    sudo apt install docker-ce -y
-    sudo apt-get install docker-compose -y 
-    sudo usermod -aG docker ${USER}
-   
-    echo "
-#####################################################################################################    
-                            Congrats Docker has been installed
-######################################################################################################
-"
-    docker -v
-
-else 
-    echo "Docker was not installed"
- 
-fi
 
 #clean
 apt autoremove -v 
