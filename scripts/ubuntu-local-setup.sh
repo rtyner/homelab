@@ -5,9 +5,6 @@ USER=rt
 HOME=/home/${USER}
 PUBKEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOexRWaRt+sGaH/edtNHmaTGxsQQxwxw0z/5VsAos3RJ rt@DESKTOP-3U6QGH9"
 
-# root
-su - root
-
 #make user and dirs
 useradd --create-home ${USER} --shell "/bin/bash"
 usermod -aG sudo ${USER}
@@ -85,17 +82,5 @@ systemctl start qemu-guest-agent
 #clean
 apt autoremove -v 
 apt clean -v 
-
-echo " 
-##################################
-Do you want to reboot now? y / n
-##################################
-"
-read reboot
-if [[ $reboot -eq "y" ]] || [[ $reboot -eq "yes" ]] ; then 
-    reboot
-else 
-    echo "Reboot was not initiated"
-fi
 
 exit 0
