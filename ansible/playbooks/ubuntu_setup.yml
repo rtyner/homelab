@@ -1,0 +1,56 @@
+---
+
+- hosts: servers
+  become: true
+  roles:
+  - role: artis3n.tailscale
+    vars:
+      tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
+  tasks:
+
+  - name: nopasswd sudo
+    lineinfile:
+        path: /etc/sudoers
+        state: present
+        backup: yes
+        regexp: '^%sudo'
+        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+        
+  - name: disable root login
+    lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        backup: yes        
+        regexp: '^PermitRootLogin'
+        line: "PermitRootLogin no"
+
+  - name: restart ssh
+    service:
+      name: ssh
+      state: restarted
+
+  - name: bashrc
+    ansible.builtin.shell:
+      cmd: wget https://raw.githubusercontent.com/rtyner/dotfiles/master/.bashrc -O /home/rt/.bashrc && chown rt:rt /home/rt/.bashrc && chmod 644 /home/rt/.bashrc
+
+  - name: standard packages
+    apt:
+      pkg: 
+      - vim
+      - git
+      - gpg
+      - htop
+      - curl
+      - unzip
+      - rsync
+      - rclone
+      - dnsutils
+      - python3-pip
+      - build-essential
+      - python3-setuptools
+      update_cache: yes
+      force_apt_get: True
+      name: "*"
+      state: latest
+      autoremove: yes
