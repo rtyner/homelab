@@ -2,6 +2,24 @@
 
 This repo is a collection of scripts and documentation for my virtualizaton/container/automation homelab.
 
+## Scripts
+
+- [Setup Local Ubuntu Host](https://github.com/rtyner/homelab/blob/main/scripts/ubuntu-local-setup.sh)
+- [Setup Proxmox Server](https://github.com/rtyner/homelab/blob/main/proxmox/pve-setup.sh)
+- [Proxmox Backup Script](https://github.com/rtyner/homelab/blob/main/proxmox/backup.sh)
+- [Create Docker Hosts](https://github.com/rtyner/homelab/blob/main/proxmox/create-docker-hosts.sh)
+- [Create Monitoring Stack](https://github.com/rtyner/homelab/blob/main/proxmox/create-monitoring-stack.sh)
+- [Create VM Template](https://github.com/rtyner/homelab/blob/main/proxmox/create-template.sh)
+
+## Documentation
+
+- [Proxmox](https://github.com/rtyner/homelab/blob/main/documentation/proxmox.md)
+- [Network](https://github.com/rtyner/homelab/blob/main/documentation/network-documentation.md)
+- [Hardware](https://github.com/rtyner/homelab/blob/main/documentation/hardware.md)
+- [Perc H310 Mini](https://github.com/rtyner/homelab/blob/main/documentation/h310%20mini.md)
+- [Docker](https://github.com/rtyner/homelab/blob/main/documentation/docker.md)
+- [Ansible](https://github.com/rtyner/homelab/blob/main/documentation/ansible.md)
+
 ## Hardware
 
 - Servers
@@ -36,24 +54,6 @@ This repo is a collection of scripts and documentation for my virtualizaton/cont
   - Opnsense VM running on Dell host (secondary planned)
   - Cisco WS-C3560G-24PS-S
   - UniFi AP-AC Lite
-
-## Scripts
-
-- [Setup Local Ubuntu Host](https://github.com/rtyner/homelab/blob/main/scripts/ubuntu-local-setup.sh)
-- [Setup Proxmox Server](https://github.com/rtyner/homelab/blob/main/proxmox/pve-setup.sh)
-- [Proxmox Backup Script](https://github.com/rtyner/homelab/blob/main/proxmox/backup.sh)
-- [Create Docker Hosts](https://github.com/rtyner/homelab/blob/main/proxmox/create-docker-hosts.sh)
-- [Create Monitoring Stack](https://github.com/rtyner/homelab/blob/main/proxmox/create-monitoring-stack.sh)
-- [Create VM Template](https://github.com/rtyner/homelab/blob/main/proxmox/create-template.sh)
-
-## Documentation
-
-- [Proxmox](https://github.com/rtyner/homelab/blob/main/documentation/proxmox.md)
-- [Network](https://github.com/rtyner/homelab/blob/main/documentation/network-documentation.md)
-- [Hardware](https://github.com/rtyner/homelab/blob/main/documentation/hardware.md)
-- [Perc H310 Mini](https://github.com/rtyner/homelab/blob/main/documentation/h310%20mini.md)
-- [Docker](https://github.com/rtyner/homelab/blob/main/documentation/docker.md)
-- [Ansible](https://github.com/rtyner/homelab/blob/main/documentation/ansible.md)
 
 ## Network Information
 
