@@ -1,19 +1,16 @@
 #!/bin/bash
 
-qm clone 1000 200 --name rt-prod-docker-1
-qm set 200 --sshkeys /root/.ssh/id_ed25519.pub
-qm set 200 --ipconfig0 ip=10.1.1.200/24,gw=10.1.1.1
-qm resize 200 scsi0 +20G
-qm start 200
+qm clone 1001 208 --name rt-prod-docker-node1
+qm set 208 --sockets 2 --cores 4 --memory 4096 --sshkeys /root/.ssh/id_ed25519.pub --ciuser rt --ipconfig0 ip=10.1.1.208/24,gw=10.1.1.1 --autostart 1
+qm resize 208 scsi0 +22G
+qm start 208
 
-qm clone 1000 201 --name rt-prod-docker-2
-qm set 201 --sshkeys /root/.ssh/id_ed25519.pub
-qm set 201 --ipconfig0 ip=10.1.1.201/24,gw=10.1.1.1
-qm resize 201 scsi0 +20G
-qm start 201
+qm clone 1001 209 --name rt-prod-docker-node2
+qm set 209 --sockets 2 --cores 4 --memory 4096 --sshkeys /root/.ssh/id_ed25519.pub --ciuser rt --ipconfig0 ip=10.1.1.209/24,gw=10.1.1.1 --autostart 1
+qm resize 209 scsi0 +22G
+qm start 209
 
-qm clone 1000 202 --name rt-prod-docker-3
-qm set 202 --sshkeys /root/.ssh/id_ed25519.pub
-qm set 202 --ipconfig0 ip=10.1.1.202/24,gw=10.1.1.1
-qm resize 202 scsi0 +20G
-qm start 202
+qm clone 1001 210 --name rt-prod-docker-node3
+qm set 210 --sockets 2 --cores 4 --memory 4096 --sshkeys /root/.ssh/id_ed25519.pub --ciuser rt --ipconfig0 ip=10.1.1.210/24,gw=10.1.1.1 --autostart 1
+qm resize 210 scsi0 +22G
+qm start 210
