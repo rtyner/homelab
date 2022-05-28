@@ -63,22 +63,6 @@ ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
 #bashrc
 wget https://raw.githubusercontent.com/rtyner/dotfiles/master/.bashrc -O ${HOME}/.bashrc
 
-#update and install
-apt-get update -y && apt-get upgrade -y
-apt install -y \
-    vim \
-    git \
-    curl \
-    htop \
-    unzip \
-    python3-pip \
-    python3-setuptools \
-    build-essential \
-    rclone \
-    rsync \
-    gpg \
-    dnsutils \
-
 # tailscale install
 curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/focal.gpg | sudo apt-key add -
 curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/focal.list | sudo tee /etc/apt/sources.list.d/tailscale.list
