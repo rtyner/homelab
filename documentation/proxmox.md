@@ -1,5 +1,12 @@
 # Proxmox Notes
 
+## links
+
+- <https://registry.terraform.io/modules/sdhibit/cloud-init-vm/proxmox/latest/examples/ubuntu_single_vm>
+- <https://matthewkalnins.com/posts/home-lab-setup-part-1-proxmox-cloud-init/>
+- <https://www.cyberciti.biz/faq/how-to-add-ssh-public-key-to-qcow2-linux-cloud-images-using-virt-sysprep/>
+- <https://austinsnerdythings.com/2021/08/30/how-to-create-a-proxmox-ubuntu-cloud-init-image/>
+
 ## qm commands
 
 ### create vm with cloudinit
@@ -179,6 +186,7 @@ update-initramfs -k all -u
 ### vm booting to passed through hba
 
 - <https://old.reddit.com/r/homelab/comments/4t8p4j/freenas_in_proxmox_vm/>
+- ![host-pci](images/Pasted image 20220522211124.png)
 
 ## nfs
 
@@ -218,6 +226,8 @@ umount -f -l /mnt/pve/ssd-pool
 
 - give opnsense two bridged nics that are separate from what proxmox is using
 - i used vmbr1 (eno1) and vmbr0 (eno2)
+- [opnsense-nics](images/Pasted image 20220521185500.png)
+- [vm-nics](images\Pasted image 20220521185353.png)
 
 ### disk testing
 
