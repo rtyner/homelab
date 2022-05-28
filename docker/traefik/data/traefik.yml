@@ -1,3 +1,7 @@
+# export USERNAME=
+# export HASHED_PASSWORD=
+# export HASHED_PASSWORD=$(openssl passwd -apr1 $PASSWORD)
+
 api:
   dashboard: true
   debug: true

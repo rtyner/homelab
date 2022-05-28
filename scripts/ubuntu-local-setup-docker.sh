@@ -70,6 +70,13 @@ curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/focal.list | sudo tee /etc/a
 sudo apt-get update
 sudo apt-get install tailscale
 
+# telegraf install
+wget -qO- https://repos.influxdata.com/influxdb.key | sudo apt-key add -
+source /etc/lsb-release
+echo "deb https://repos.influxdata.com/${DISTRIB_ID,,} ${DISTRIB_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+apt-get install telegraf
+systemctl start telegraf
+
 # qemu-gust-agent install
 apt-get install qemu-guest-agent -y
 systemctl enable qemu-guest-agent
