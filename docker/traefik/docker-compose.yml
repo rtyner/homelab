@@ -1,4 +1,7 @@
 version: '3'
+# need to export the following variables
+# EMAIL, APO_TOKEN, USERNAME, PASSWORD
+# hash pw with export HASHED_PASSWORD=$(openssl passwd -apr1 $PASSWORD)
 
 services:
   traefik:
