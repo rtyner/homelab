@@ -31,8 +31,9 @@
       state: restarted
 
   - name: bashrc
-    ansible.builtin.shell:
-      cmd: wget https://raw.githubusercontent.com/rtyner/dotfiles/master/.bashrc -O /home/rt/.bashrc && chown rt:rt /home/rt/.bashrc && chmod 644 /home/rt/.bashrc
+    get_url: 
+      url: https://raw.githubusercontent.com/rtyner/dotfiles/master/.bashrc
+      dest: /home/rt/
 
   - name: standard packages
     apt:
