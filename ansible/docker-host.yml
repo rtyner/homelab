@@ -1,6 +1,6 @@
 ---
 
-- hosts: docker
+- hosts: swarm
   become: true
   roles:
   - role: artis3n.tailscale
@@ -31,8 +31,12 @@
       state: restarted
 
   - name: bashrc
-    ansible.builtin.shell:
-      cmd: wget https://raw.githubusercontent.com/rtyner/dotfiles/master/.bashrc -O /home/rt/.bashrc && chown rt:rt /home/rt/.bashrc && chmod 644 /home/rt/.bashrc
+    get_url: 
+      url: https://raw.githubusercontent.com/rtyner/dotfiles/master/.bashrc
+      dest: /home/rt/
+  
+  - name: Install Docker
+    shell: cd ~ && curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh && sudo usermod -aG docker rt
 
   - name: standard packages
     apt:
