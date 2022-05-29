@@ -47,6 +47,10 @@ rt-prod-k8s-node1.local.rtynerlabs.io
 rt-prod-k8s-node2.local.rtynerlabs.io
 rt-prod-k8s-node3.local.rtynerlabs.io
 
+[remote]
+vultr-prod-vpn-1
+vultr-prod-docker-1
+
 [lxc]
 dns-1.local.rtynerlabs.io
 dns-2.local.rtynerlabs.io
