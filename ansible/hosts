@@ -18,6 +18,7 @@ rt-prod-k8s-master1.local.rtynerlabs.io
 rt-prod-k8s-node1.local.rtynerlabs.io	
 rt-prod-k8s-node2.local.rtynerlabs.io
 rt-prod-k8s-node3.local.rtynerlabs.io
+rt-prod-docker-manager1.local.rtynerlabs.io
 rt-prod-docker-node1.local.rtynerlabs.io
 rt-prod-docker-node2.local.rtynerlabs.io
 rt-prod-docker-node3.local.rtynerlabs.io
@@ -37,6 +38,13 @@ pve-3.local.rtynerlabs.io
 [docker]
 docker-1.local.rtynerlabs.io
 traefik-dashboard.local.rtynerlabs.io
+rt-prod-docker-manager1.local.rtynerlabs.io
+rt-prod-docker-node1.local.rtynerlabs.io
+rt-prod-docker-node2.local.rtynerlabs.io
+rt-prod-docker-node3.local.rtynerlabs.io
+
+[swarm]
+rt-prod-docker-manager1.local.rtynerlabs.io
 rt-prod-docker-node1.local.rtynerlabs.io
 rt-prod-docker-node2.local.rtynerlabs.io
 rt-prod-docker-node3.local.rtynerlabs.io
