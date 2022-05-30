@@ -1,0 +1,11 @@
+- hosts: swarm
+  become: true
+  tasks:
+  
+  - name: bashrc
+    get_url: 
+      url: https://raw.githubusercontent.com/rtyner/dotfiles/master/.bashrc
+      dest: /home/rt/
+  
+  - name: Install Docker
+    shell: cd ~ && curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh && sudo usermod -aG docker rt
