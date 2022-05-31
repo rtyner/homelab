@@ -1,6 +1,6 @@
 ---
 
-- hosts: swarm
+- hosts: do
   become: true
   roles:
   - role: artis3n.tailscale
@@ -29,15 +29,7 @@
     service:
       name: ssh
       state: restarted
-
-  - name: bashrc
-    get_url: 
-      url: https://raw.githubusercontent.com/rtyner/dotfiles/master/.bashrc
-      dest: /home/rt/
   
-  - name: Install Docker
-    shell: cd ~ && curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh && sudo usermod -aG docker rt
-
   - name: standard packages
     apt:
       pkg: 
@@ -54,7 +46,34 @@
       - build-essential
       - python3-setuptools
       update_cache: yes
-      force_apt_get: True
-      name: "*"
+
+  - name: bashrc
+    get_url: 
+      url: https://raw.githubusercontent.com/rtyner/dotfiles/master/.bashrc
+      dest: /home/rt/
+  
+  - name: Add Docker GPG apt Key
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+  
+  - name: Add Docker Repository
+    apt_repository:
+      repo: deb https://download.docker.com/linux/ubuntu focal stable
+      state: present
+  - name: Update apt and install docker-ce
+    apt:
+      name: docker-ce
       state: latest
-      autoremove: yes
+      update_cache: true
+  - name: Install Docker Module for Python
+    pip:
+      name: docker
+
+  - name: Create a new regular user with sudo privileges
+    user:
+      name: rt
+      state: present
+      groups: sudo, docker
+      append: true
+      create_home: true
