@@ -22,6 +22,9 @@ rt-prod-docker-manager1.local.rtynerlabs.io
 rt-prod-docker-node1.local.rtynerlabs.io
 rt-prod-docker-node2.local.rtynerlabs.io
 rt-prod-docker-node3.local.rtynerlabs.io
+vultr-prod-vpn-1.rtynerlabs.io
+vultr-prod-docker-1.rtynerlabs.io
+do-prod-docker-1.rtynerlabs.io
 
 [ubuntu]
 traefik-dashboard.local.rtynerlabs.io
@@ -29,6 +32,17 @@ grafana-1.local.rtynerlabs.io
 influx-1.local.rtynerlabs.io
 docker-1.local.rtynerlabs.io
 prometheus-1.local.rtynerlabs.io
+rt-prod-k8s-master1.local.rtynerlabs.io	
+rt-prod-k8s-node1.local.rtynerlabs.io	
+rt-prod-k8s-node2.local.rtynerlabs.io
+rt-prod-k8s-node3.local.rtynerlabs.io
+rt-prod-docker-manager1.local.rtynerlabs.io
+rt-prod-docker-node1.local.rtynerlabs.io
+rt-prod-docker-node2.local.rtynerlabs.io
+rt-prod-docker-node3.local.rtynerlabs.io
+vultr-prod-vpn-1.rtynerlabs.io
+vultr-prod-docker-1.rtynerlabs.io
+do-prod-docker-1.rtynerlabs.io
 
 [proxmox]
 pve-1.local.rtynerlabs.io
@@ -42,6 +56,8 @@ rt-prod-docker-manager1.local.rtynerlabs.io
 rt-prod-docker-node1.local.rtynerlabs.io
 rt-prod-docker-node2.local.rtynerlabs.io
 rt-prod-docker-node3.local.rtynerlabs.io
+vultr-prod-docker-1.rtynerlabs.io
+do-prod-docker-1.rtynerlabs.io
 
 [swarm]
 rt-prod-docker-manager1.local.rtynerlabs.io
@@ -56,8 +72,16 @@ rt-prod-k8s-node2.local.rtynerlabs.io
 rt-prod-k8s-node3.local.rtynerlabs.io
 
 [remote]
-vultr-prod-vpn-1
-vultr-prod-docker-1
+vultr-prod-vpn-1.rtynerlabs.io
+vultr-prod-docker-1.rtynerlabs.io
+do-prod-docker-1.rtynerlabs.io
+
+[vultr]
+vultr-prod-vpn-1.rtynerlabs.io
+vultr-prod-docker-1.rtynerlabs.io
+
+[do]
+do-prod-docker-1.rtynerlabs.io
 
 [lxc]
 dns-1.local.rtynerlabs.io
