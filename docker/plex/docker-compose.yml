@@ -9,9 +9,12 @@ services:
       - PUID=1000
       - PGID=1000
       - VERSION=docker
-      - PLEX_CLAIM=claim-9td7qzDa4KEY5Hmn3q3-
+      - PLEX_CLAIM=
     volumes:
-      - /media/red/Media/library:/config
-      - /media/red/Media/TV:/tv
-      - /media/red/Media/Movies:/movies
+      - /home/rt/docker/plex/config:/config
+      - /home/rt/truenas-share/Media/TV:/tv
+      - /home/rt/truenas-share/Media/Movies:/movies
+      - /home/rt/truenas-share/Media/Music/:/music
+      - /home/rt/truenas-share/Media/Anime/Movies:/anime_movies
+      - /home/rt/truenas-share/Media/Anime/Shows:/anime_shows
     restart: unless-stopped
