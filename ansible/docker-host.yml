@@ -1,6 +1,6 @@
 ---
 
-- hosts: do
+- hosts: big_docker
   become: true
   roles:
   - role: artis3n.tailscale
