@@ -47,6 +47,7 @@
       - rsync
       - rclone
       - dnsutils
+      - nfs-common
       - python3-pip
       - build-essential
       - python3-setuptools
