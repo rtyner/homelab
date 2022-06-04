@@ -12,8 +12,3 @@ services:
       # These ports are in format <host-port>:<container-port>
       - '8000:8000' # idk some portainer thing
       - '9443:9443' # portainer web ui
-
-networks:
-  default:
-    external:
-      name: proxy
