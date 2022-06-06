@@ -1,6 +1,6 @@
 ---
 
-- hosts: big_docker
+- hosts: swarm
   become: true
   roles:
   - role: artis3n.tailscale
