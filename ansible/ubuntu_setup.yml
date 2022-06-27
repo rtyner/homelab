@@ -48,6 +48,7 @@
       - rclone
       - dnsutils
       - nfs-common
+      - cifs-utils      
       - python3-pip
       - build-essential
       - python3-setuptools
