@@ -4,9 +4,16 @@ pve-1.local.rtynerlabs.io
 pve-2.local.rtynerlabs.io
 pve-3.local.rtynerlabs.io
 core-sw-01.local.rtynerlabs.io
+nfs-file-1.local.rtynerlabs.io
+10.1.1.53
+10.1.1.54
 
 [cisco]
 core-sw-01.local.rtynerlabs.io
+
+[dns]
+10.1.1.53
+10.1.1.54
 
 [servers]
 prod-docker-1.local.rtynerlabs.io
@@ -25,6 +32,7 @@ vultr-prod-vpn-1.rtynerlabs.io
 vultr-prod-docker-1.rtynerlabs.io
 do-prod-docker-1.rtynerlabs.io
 prod-docker-2.local.rtynerlabs.io
+10.1.1.22
 
 [ubuntu]
 prod-docker-1.local.rtynerlabs.io
@@ -43,6 +51,10 @@ vultr-prod-vpn-1.rtynerlabs.io
 vultr-prod-docker-1.rtynerlabs.io
 do-prod-docker-1.rtynerlabs.io
 prod-docker-2.local.rtynerlabs.io
+10.1.1.22
+
+[file]
+10.1.1.22
 
 [proxmox]
 pve-1.local.rtynerlabs.io
