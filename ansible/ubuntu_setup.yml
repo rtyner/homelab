@@ -1,11 +1,11 @@
 ---
 
-- hosts: servers
+- hosts: dns
   become: true
   roles:
-  - role: artis3n.tailscale
-    vars:
-      tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
+    #  - role: artis3n.tailscale
+    #vars:
+    #  tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
   tasks:
 
   - name: nopasswd sudo
@@ -32,7 +32,7 @@
 
   - name: bashrc
     get_url: 
-      url: https://raw.githubusercontent.com/rtyner/dotfiles/master/.bashrc
+      url: https://raw.githubusercontent.com/rtyner/dotfiles/main/thinkpad/.bashrc
       dest: /home/rt/
 
   - name: standard packages
