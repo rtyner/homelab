@@ -1,0 +1,174 @@
+ appConfig:
+  theme: nord-frost
+  layout: auto
+  iconSize: medium
+  language: en
+  auth:
+    users:
+      - user: rt
+        hash: C7B5B3C24CE0A043469F8A2ADA02224600E406627BF9A0397FE10B8320209079
+        type: admin
+ pageInfo:
+   title: rtynerlabs.io
+   description: Welcome to your new dashboard!
+   navLinks:
+     - title: GitHub
+       path: https://github.com/Lissy93/dashy
+     - title: Documentation
+       path: https://dashy.to/docs
+   footerText: ''
+ sections:
+  - name: Today
+    icon: far fa-calendar-day
+    widgets:
+    - type: clock
+      options:
+        format: en-GB
+    - type: weather
+      options:
+        apiKey: 
+        city: Lakeland
+        units: imperial
+    - type: github-trending-repos
+      options:
+        limit: 8
+        since: weekly  
+  - name: Local Resources
+    icon: mdi-house
+    displayData:
+      sortBy: default
+      rows: 5
+      cols: 1
+      collapsed: false
+      hideForGuests: false
+    items:
+      - title: Proxy
+        icon: hl-nginxproxymanager
+        url: https://proxy.local.rtynerlabs.io
+        statusCheck: false
+        id: 0_1478_proxy
+      - title: PVE-1
+        icon: hl-proxmox
+        url: https://pve-1.local.rtynerlabs.io
+        id: 1_1478_pve
+      - title: PVE-2
+        icon: hl-proxmox
+        url: https://pve-2.local.rtynerlabs.io
+        id: 2_1478_pve
+      - title: DNS-1
+        icon: hl-pihole
+        url: https://dns-1.local.rtynerlabs.io/admin/
+        id: 3_1478_dns
+      - title: DNS-2
+        icon: hl-pihole
+        url: https://dns-2.local.rtynerlabs.io/admin
+        id: 4_1478_dns
+      - title: Portainer
+        icon: hl-portainer
+        url: https://portainer.local.rtynerlabs.io
+        statusCheck: false
+        id: 5_1478_portainer
+      - title: iDRAC
+        icon: hl-idrac
+        url: https://10.1.1.222/login.html
+        id: 6_1478_idrac
+      - title: Traefik
+        icon: hl-traefik
+        url: https://traefik-dashboard.local.rtynerlabs.io
+        id: 7_1478_traefik
+      - title: Syncthing
+        icon: hl-syncthing
+        url: https://syncthing.local.rtynerlabs.io
+        id: 8_1478_syncthing
+      - title: Grafana
+        icon: hl-grafana
+        url: https://grafana.local.rtynerlabs.io
+        statusCheck: false
+        id: 9_1478_grafana
+      - title: Prometheus
+        icon: hl-prometheus
+        url: https://prometheus.local.rtynerlabs.io
+        statusCheck: false
+        id: 10_1478_prometheus
+  - name: Remote Resources
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 1
+      collapsed: false
+      hideForGuests: false
+    items:
+      - title: Proxy
+        icon: hl-nginxproxymanager
+        url: https://proxy.rtynerlabs.io
+        statusCheck: true
+        provider: Digital Ocean
+        id: 0_1607_proxy
+      - title: Portainer
+        icon: hl-portainer
+        url: https://portainer.rtynerlabs.io
+        statusCheck: true
+        id: 1_1607_portainer
+      - title: RUTorrent
+        icon: hl-rutorrent
+        url: https://juno.whatbox.ca/webui/
+        statusCheck: true
+        id: 2_1607_rutorrent
+      - title: Bookmarks
+        icon: hl-linkace
+        url: https://bookmarks.rtynerlabs.io/bookmarks
+        statusCheck: true
+        id: 3_1607_bookmarks
+      - title: Docs
+        icon: >-
+          https://github.com/squidfunk/mkdocs-material/blob/master/material/assets/images/favicon.png
+        url: https://docs.rtynerlabs.io/
+        id: 4_1607_docs
+      - title: Search
+        icon: hl-whooglesearch
+        url: https://search.rtynerlabs.io
+        statusCheck: true
+        id: 5_1607_search
+      - title: Syncthing
+        icon: hl-syncthing
+        url: http://juno.whatbox.ca:14569/
+        id: 6_1607_syncthing
+  - name: Websites
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 1
+      collapsed: false
+      hideForGuests: false
+    items:
+      - title: Plex
+        icon: hl-plex
+        url: https://app.plex.tv/desktop/#!/
+        id: 0_838_plex
+      - title: Cloudflare
+        icon: hl-cloudflare
+        url: https://dash.cloudflare.com/
+        id: 1_838_cloudflare
+      - title: Vultr
+        icon: hl-vultr
+        url: https://www.vultr.com/
+        id: 2_838_vultr
+  - name: Finance
+    widgets:
+    - type: crypto-watch-list
+      options:
+        currency: USD
+        sortBy: marketCap
+        assets:
+        - bitcoin
+        - ethereum
+        - monero
+        - cardano
+        - vechain
+        - algorand
+  - name: Network
+    widgets:
+    - type: pi-hole-stats
+      options:
+        hostname: https://10.1.1.10
+  

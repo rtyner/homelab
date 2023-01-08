@@ -1,0 +1,7 @@
+version: "3.7"
+services:
+  screego:
+    image: screego/server:1.8.0
+    network_mode: host
+    environment:
+      SCREEGO_EXTERNAL_IP: 150.230.169.134

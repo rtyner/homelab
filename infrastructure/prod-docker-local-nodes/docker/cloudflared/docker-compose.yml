@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:2022.1.3-amd64 #update the verion where necessary
+    container_name: cloudflared
+    restart: unless-stopped
+    networks:
+      - proxy
+    command: tunnel --config /home/nonroot/.cloudflared/config.yml run UUID #Replace UUID with your actual UUID
+    volumes:
+      - /opt/cloudflared/data:/home/nonroot/.cloudflared/
+networks:
+  proxy:
+    driver: bridge
+    external: true

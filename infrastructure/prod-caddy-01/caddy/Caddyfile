@@ -1,0 +1,40 @@
+{
+    acme_dns cloudflare API_TOKEN
+}
+
+https://local.rtynerlabs.io {
+    
+    # enable static file server
+    file_server
+
+    # compress response
+    encode gzip 
+
+    #test response
+    respond "hello"
+
+}
+
+https://dns-1.local.rtynerlabs.io {
+
+    reverse_proxy 10.1.1.53:80
+
+}
+
+https://dns-2.local.rtynerlabs.io {
+
+    reverse_proxy 10.1.1.54:80
+
+}
+
+https://pve-1.local.rtynerlabs.io {
+
+    reverse_proxy 10.1.1.2:8006
+
+}
+
+https://ipam.local.rtynerlabs.io {
+
+    reverse_proxy 10.1.1.11:8091
+
+}

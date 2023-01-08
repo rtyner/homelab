@@ -1,0 +1,21 @@
+---
+
+- hosts: pve 
+  become: true
+  roles:
+    - geerlingguy.node_exporter
+  tasks:
+
+  - name: nopasswd sudo
+    lineinfile:
+        path: /etc/sudoers
+        state: present
+        backup: yes
+        regexp: '^%sudo'
+        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+
+  - name: bashrc
+    get_url: 
+      url: https://raw.githubusercontent.com/rtyner/dotfiles/main/thinkpad/.bashrc
+      dest: /home/rt/

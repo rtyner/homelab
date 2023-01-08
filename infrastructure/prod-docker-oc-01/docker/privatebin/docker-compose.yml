@@ -1,0 +1,20 @@
+version: "3.7"
+
+services:
+  privatebin:
+    image: privatebin/nginx-fpm-alpine
+    read_only: true # not in compose 3.0 documentation but appears supported based
+    # on issues for docker compose in Github
+    volumes:
+      - './privatebin-data:/srv/data' # data volume for pastes allows pastes
+      # to persist after container stop or restart
+      - './conf.php:/srv/cfg/conf.php:ro' # second volume for custom configuration file
+    ports:
+      # To update: Be sure to use a reverse proxy for HTTPS termination
+      # in front of it for production environments.
+      # ie, The Nginx setup supports only HTTP, so make sure that you run
+      # another webserver as reverse proxy in front of this for HTTPS
+      #offloading and reducing the attack surface on your TLS stack. The
+      # Nginx in this image is set up to deflate/gzip text content.
+      - 8080:80
+    restart: always

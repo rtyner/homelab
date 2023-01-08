@@ -1,0 +1,16 @@
+---
+version: "2.1"
+services:
+  nextcloud:
+    image: lscr.io/linuxserver/nextcloud:latest
+    container_name: nextcloud
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ=America/New_York
+    volumes:
+      - /home/rt/nextcloud/config:/config
+      - /home/rt/truenas-share/:/data
+    ports:
+      - 443:443
+    restart: unless-stopped

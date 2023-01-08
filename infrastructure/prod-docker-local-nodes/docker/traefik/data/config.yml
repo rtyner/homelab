@@ -1,0 +1,189 @@
+http:
+ #region routers 
+  routers:
+    proxmox:
+      entryPoints:
+        - "https"
+      rule: "Host(`pve-1.local.rtynerlabs.io`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: proxmox
+    pihole1:
+      entryPoints:
+        - "https"
+      rule: "Host(`dns-1.local.rtynerlabs.io`)"
+      middlewares:
+        - default-headers
+        - addprefix-pihole
+        - https-redirectscheme
+      tls: {}
+      service: pihole1
+    pihole2:
+      entryPoints:
+        - "https"
+      rule: "Host(`dns-2.local.rtynerlabs.io`)"
+      middlewares:
+        - default-headers
+        - addprefix-pihole
+        - https-redirectscheme
+      tls: {}
+      service: pihole2
+    unifi:
+      entryPoints:
+        - "https"
+      rule: "Host(`unifi.local.rtynerlabs.io`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: unifi
+    uptimekuma:
+      entryPoints:
+        - "https"
+      rule: "Host(`uptimekuma.local.rtynerlabs.io`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: uptimekuma
+    smokeping:
+      entryPoints:
+        - "https"
+      rule: "Host(`smokeping.local.rtynerlabs.io`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: smokeping
+    heimdall:
+      entryPoints:
+        - "https"
+      rule: "Host(`heimdall.local.rtynerlabs.io`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: heimdall
+    opnsense:
+      entryPoints:
+        - "https"
+      rule: "Host(`opnsense.local.rtynerlabs.io`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: opnsense
+#endregion
+
+#region services
+  services:
+    proxmox:
+      loadBalancer:
+        servers:
+          - url: "https://10.1.1.2:8006"
+        passHostHeader: true
+    pihole1:
+      loadBalancer:
+        servers:
+          - url: "http://10.1.1.10:80"
+        passHostHeader: true
+      pihole2:
+      loadBalancer:
+        servers:
+          - url: "http://10.1.1.11:80"
+        passHostHeader: true
+    unifi:
+      loadBalancer:
+        servers:
+          - url: "http://10.1.1.12:8443"
+        passHostHeader: true
+    uptimekuma:
+      loadBalancer:
+        servers:
+          - url: "https://10.1.1.200:3001"
+        passHostHeader: true
+    phpipam:
+      loadBalancer:
+        servers:
+          - url: "https://10.1.1.200:80"
+        passHostHeader: true
+    smokeping:
+      loadBalancer:
+        servers:
+          - url: "https://10.1.1.200:49153/"
+        passHostHeader: true
+    heimdall:
+      loadBalancer:
+        servers:
+          - url: "https://10.1.1.200:49155"
+        passHostHeader: true
+    idrac:
+      loadBalancer:
+        servers:
+          - url: "https://10.1.1.222"
+    idrac-console:
+      loadBalancer:
+        servers:
+          - url: "https://10.1.1.222:5900"
+        passHostHeader: true
+        passHostHeader: true
+    opnsense:
+      loadBalancer:
+        servers:
+          - url: "https://10.1.1.1"
+        passHostHeader: true
+    portainer:
+      loadBalancer:
+        servers:
+          - url: "http://10.1.1.200:9443"
+        passHostHeader: true
+#endregion
+  middlewares:
+    addprefix-pihole:
+      addPrefix:
+        prefix: "/admin"
+    https-redirectscheme:
+      redirectScheme:
+        scheme: https
+        permanent: true
+
+    default-headers:
+      headers:
+        frameDeny: true
+        sslRedirect: true
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 15552000
+        customFrameOptionsValue: SAMEORIGIN
+        customRequestHeaders:
+          X-Forwarded-Proto: https
+
+    idrac:
+      headers:
+        frameDeny: true
+        sslRedirect: true
+        browserXssFilter: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsSeconds: 15552000
+        customFrameOptionsValue: SAMEORIGIN
+        customRequestHeaders:
+          X-Forwarded-Proto: https
+
+    default-whitelist:
+      ipWhiteList:
+        sourceRange:
+        - "10.0.0.0/8"
+        - "10.1.1.0/16"
+        - "172.16.0.0/12"
+
+    secured:
+      chain:
+        middlewares:
+        - default-whitelist
+        - default-headers

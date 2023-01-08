@@ -1,0 +1,85 @@
+---
+- hosts: do
+  become: true
+  roles:
+      #- role: artis3n.tailscale
+  vars:
+      #tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
+  tasks:
+
+  - name: Create a login user
+    user:
+       name: rt
+       password: "{{ 'CHANGEME' | password_hash('sha512') }}"
+       groups:
+        - sudo
+       state: present
+       shell: /bin/bash
+       system: no
+       createhome: yes
+       home: /home/rt
+
+  - name: Set authorized key taken from file
+    ansible.posix.authorized_key:
+      user: rt
+      state: present
+      key: "{{ lookup('file', '/home/rt/.ssh/id_ed25519.pub') }}"
+ 
+  - name: nopasswd sudo
+    lineinfile:
+        path: /etc/sudoers
+        state: present
+        backup: yes
+        regexp: '^%sudo'
+        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+        
+  - name: disable root login
+    lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        backup: yes        
+        regexp: '^PermitRootLogin'
+        line: "PermitRootLogin no"
+
+  - name: restart ssh
+    service:
+      name: sshd
+      state: restarted
+
+  - name: allow all access from local range ufw
+    ufw:
+      rule: allow
+      src: 10.0.0.0/8
+
+  - name: bashrc
+    get_url: 
+      url: https://raw.githubusercontent.com/rtyner/dotfiles/main/thinkpad/.bashrc
+      dest: /home/rt/
+
+  - name: Install aptitude
+    apt:
+      name: aptitude
+      state: latest
+      update_cache: true
+
+  - name: standard packages
+    apt:
+      pkg: 
+      - vim
+      - git
+      - gpg
+      - htop
+      - curl
+      - unzip
+      - rsync
+      - rclone
+      - dnsutils
+      - nfs-common
+      - cifs-utils      
+      - python3-pip
+      - build-essential
+      - python3-setuptools
+      update_cache: true
+      state: latest
+      autoremove: yes

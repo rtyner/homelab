@@ -1,0 +1,10 @@
+# Static information about the filesystems.
+# See fstab(5) for details.
+
+# <file system> <dir> <type> <options> <dump> <pass>
+
+//10.1.1.6/big-dick-pool /home/rt/mnt/big-dick-pool cifs _netdev,nofail,credentials=/home/rt/.config/smb/.creds,user 0 0
+
+//10.1.1.6/red-share /home/rt/mnt/red cifs _netdev,nofail,mfsymlinks,credentials=/home/rt/.config/smb/.creds,user 0 0
+
+/dev/sdb1 /home/rt/mnt/arch-storage ext4 user,defaults 0 1

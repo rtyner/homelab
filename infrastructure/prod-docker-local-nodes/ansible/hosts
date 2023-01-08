@@ -1,0 +1,5 @@
+[docker]
+prod-docker-local-mgr-01.local.rtynerlabs.io
+prod-docker-local-node-01.local.rtynerlabs.io
+prod-docker-local-node-02.local.rtynerlabs.io
+prod-docker-local-node-03.local.rtynerlabs.io
