@@ -31,7 +31,7 @@ resource "proxmox_vm_qemu" "prometheus" {
     agent = 1
 
     clone = var.template_name
-    cores = 2
+    cores = 1
     sockets = 1
     cpu = "host"
     memory = 2048
