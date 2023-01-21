@@ -1,0 +1,12 @@
+[windows]
+10.1.1.147
+10.1.1.146
+10.1.1.149
+
+[windows:vars]
+ ansible_user: "{{ lookup('env', 'DOMAIN_UN') }}"
+ ansible_password: "{{ lookup('env', 'DOMAIN_PW') }}"
+ ansible_connection: winrm
+ ansible_port: 5985
+ ansible_winrm_transport: kerberos
+ ansible_winrm_server_cert_validation: ignore
