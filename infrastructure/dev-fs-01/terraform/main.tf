@@ -22,20 +22,20 @@ provider "proxmox" {
   pm_tls_insecure = true
 }
 
-resource "proxmox_vm_qemu" "bl-vm-02" {
-    name = "bl-vm-02"
-    desc = "bryans ubuntu"
-    count = 0
+resource "proxmox_vm_qemu" "hyperv" {
+    name = "dev-fs-01"
+    desc = "dev file server"
+    count = 1
     target_node = var.proxmox_host
-    vmid = 124
+    vmid = 503
 
     agent = 1
 
     clone = var.template_name
-    cores = 8
+    cores = 2
     sockets = 1
     cpu = "host"
-    memory = 8192
+    memory = 4096
 
     network {
       bridge = "vmbr0"
@@ -45,16 +45,8 @@ resource "proxmox_vm_qemu" "bl-vm-02" {
     disk {
       storage = "local"
       type = "scsi"
-      size = "80G"
+      size = "50G"
       ssd = 1
       discard = "on"
     }
-    
-    sshkeys = <<EOF
-    ${var.ssh_key}
-    EOF
-
-    os_type = "cloud-init"
-    ipconfig0 = "ip=10.1.1.47/24,gw=10.1.1.1"
-    nameserver = "1.1.1.1, 8.8.8.8"
 }
