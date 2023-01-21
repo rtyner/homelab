@@ -1,8 +1,9 @@
-- hosts: caddy
+- hosts: hosts
   become: true
   roles:
     - geerlingguy.node_exporter
     - artis3n.tailscale
+    - robertdebock.fail2ban
   
   vars:
     - tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
@@ -88,6 +89,7 @@
           - cifs-utils
           - python3
           - python3-pip
+          - ansible
           - build-essential
           - python3-setuptools
   
@@ -99,6 +101,14 @@
     - name: create working dir
       ansible.builtin.file:
         path: /home/rt/working
+        state: directory
+        owner: rt 
+        group: rt
+        mode: '0755'
+
+    - name: create repos dir
+      ansible.builtin.file:
+        path: /home/rt/repos
         state: directory
         owner: rt 
         group: rt

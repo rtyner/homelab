@@ -23,18 +23,18 @@ provider "proxmox" {
 }
 
 resource "proxmox_vm_qemu" "linux-dev" {
-    name = "linux-dev-0${count.index + 1}"
+    name = "linux-dev-01"
     desc = "dev server"
     count = 1
     target_node = var.proxmox_host
-    
     agent = 1
-
+    
     clone = var.template_name
-    cores = 4
+    
+    cores = 8
     sockets = 1
     cpu = "host"
-    memory = 8192
+    memory = 16384
 
     network {
       bridge = "vmbr0"
@@ -44,7 +44,7 @@ resource "proxmox_vm_qemu" "linux-dev" {
     disk {
       storage = "local"
       type = "scsi"
-      size = "30G"
+      size = "64G"
       ssd = 1
       discard = "on"
     }
@@ -54,6 +54,6 @@ resource "proxmox_vm_qemu" "linux-dev" {
     EOF
 
     os_type = "cloud-init"
-    ipconfig0 = "ip=10.1.1.3${count.index + 1}/24,gw=10.1.1.1"
+    ipconfig0 = "ip=10.1.1.27/24,gw=10.1.1.1"
     nameserver = "10.1.1.53, 10.1.1.54"
 }
