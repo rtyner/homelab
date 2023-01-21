@@ -8,7 +8,7 @@ variable "proxmox_host" {
 }
 #Specify which template name you'd like to use
 variable "template_name" {
-    default = "debian-11-template"
+    default = "ubuntu-2004-cloud-template"
 }
 #Establish which nic you would like to utilize
 variable "nic_name" {
