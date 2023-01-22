@@ -25,7 +25,7 @@ provider "proxmox" {
 resource "proxmox_vm_qemu" "hyperv" {
     name = "dev-hyperv-01"
     desc = "dev hyperv server"
-    count = 1
+    count = 0
     target_node = var.proxmox_host
     vmid = 504
 
