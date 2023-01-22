@@ -8,7 +8,7 @@ variable "proxmox_host" {
 }
 #Specify which template name you'd like to use
 variable "template_name" {
-    default = "win-22-dc-template"
+    default = "win-22-template"
 }
 #Establish which nic you would like to utilize
 variable "nic_name" {
