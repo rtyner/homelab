@@ -35,6 +35,7 @@
 |                                 |                    |                                     |
 
 # Containers
-| hostname | ip  | function |
-| -------- | --- | -------- |
-|          |     |          |
+| hostname                        | ip  | function            |
+| ------------------------------- | --- | ------------------- |
+| plex-docker-01.local.rtyner.com |     | primary plex server |
+|                                 |     |                     |
