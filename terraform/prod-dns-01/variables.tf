@@ -2,7 +2,7 @@
 variable "vm_name" {
   description = "Name of the virtual machine"
   type        = string
-  default     = "prod-dns-01"
+  default     = "prod-docker-03"
 }
 
 variable "memory" {
