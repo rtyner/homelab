@@ -1,5 +1,0 @@
----
-
-- hosts: servers
-  become: true
-  roles:
