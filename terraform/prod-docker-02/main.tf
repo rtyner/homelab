@@ -1,5 +1,6 @@
 # main.tf
 
+# Download Debian cloud image
 resource "libvirt_volume" "debian_base" {
   name   = "debian12_base"
   pool   = "images"
@@ -7,6 +8,7 @@ resource "libvirt_volume" "debian_base" {
   format = "qcow2"
 }
 
+# Create VM volume based on Debian image
 resource "libvirt_volume" "vm_disk" {
   name           = "${var.vm_name}.qcow2"
   base_volume_id = libvirt_volume.debian_base.id
@@ -14,6 +16,7 @@ resource "libvirt_volume" "vm_disk" {
   size           = var.disk_size
 }
 
+# Create cloud-init files and ISO on remote host
 resource "null_resource" "cloud_init_iso" {
   provisioner "remote-exec" {
     connection {
@@ -108,6 +111,7 @@ resource "libvirt_domain" "vm" {
   qemu_agent = true
 }
 
+# Outputs
 output "vm_info" {
   value = {
     name        = libvirt_domain.vm.name
