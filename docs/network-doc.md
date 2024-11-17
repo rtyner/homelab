@@ -17,25 +17,28 @@
 
 # Hosts
 
-| hostname                        | ip                 | function                            |
-| ------------------------------- | ------------------ | ----------------------------------- |
-| usg.local.rtyner.com            | 10.1.1.1           | primary firewall                    |
-| arch-hv-01.local.rtyner.com     | 10.1.1.2, 10.1.1.3 | kvm hypervisor                      |
-| dev-dc-01.local.rtyner.com      | 10.1.1.4           | server 2022 domain controller       |
-| dev-dc-02.local.rtyner.com      | 10.1.1.5           | server 2022 domain controller       |
-| truenas.local.rtyner.com        | 10.1.1.6           | truenas storage                     |
-| prod-docker-01.local.rtyner.com | 10.1.1.7           | docker host 1                       |
-| prod-docker-02.local.rtyner.com | 10.1.1.8           | docker host 2                       |
-| prod-docker-03.local.rtyner.com | 10.1.1.9           | docker host 3                       |
-| prod-dns-01.local.rtyner.com    | 10.1.1.10          | prod dns server                     |
-| prod-dns-02.local.rtyner.com    | 10.1.1.11          | prod dns server                     |
-| prod-util-02.local.rtyner.com   | 10.1.1.12          | utility server, windows rsat, veeam |
-| prod-syslog-01.local.rtyner.com | 10.1.1.13          | syslog                              |
-| prod-file-01.local.rtyner.com   | 10.1.1.14          | nfs file server                     |
-|                                 |                    |                                     |
+| hostname                            | ip                 | function                            |
+| ----------------------------------- | ------------------ | ----------------------------------- |
+| usg.local.rtyner.com                | 10.1.1.1           | primary firewall                    |
+| arch-hv-01.local.rtyner.com         | 10.1.1.2, 10.1.1.3 | kvm hypervisor                      |
+| dev-dc-01.local.rtyner.com          | 10.1.1.4           | server 2022 domain controller       |
+| dev-dc-02.local.rtyner.com          | 10.1.1.5           | server 2022 domain controller       |
+| truenas.local.rtyner.com            | 10.1.1.6           | truenas storage                     |
+| prod-docker-01.local.rtyner.com     | 10.1.1.7           | docker host 1                       |
+| prod-docker-02.local.rtyner.com     | 10.1.1.8           | docker host 2                       |
+| prod-docker-03.local.rtyner.com     | 10.1.1.9           | docker host 3                       |
+| prod-dns-01.local.rtyner.com        | 10.1.1.10          | prod dns server                     |
+| prod-dns-02.local.rtyner.com        | 10.1.1.11          | prod dns server                     |
+| prod-util-02.local.rtyner.com       | 10.1.1.12          | utility server, windows rsat, veeam |
+| prod-syslog-01.local.rtyner.com     | 10.1.1.13          | syslog                              |
+| prod-file-01.local.rtyner.com       | 10.1.1.14          | nfs file server                     |
+| prod-k3s-master-01.local.rtyner.com | 10.1.1.20          | k3s master                          |
+| prod-k3s-worker-01.local.rtyner.com | 10.1.1.21          | k3s worker 1                        |
+| prod-k3s-worker-02.local.rtyner.com | 10.1.1.22          | k3s worker 2                        |
+| prod-k3s-worker-03.local.rtyner.com | 10.1.1.23          | k3s worker 3                        |
 
 # Containers
 | hostname                        | ip  | function            |
 | ------------------------------- | --- | ------------------- |
 | plex-docker-01.local.rtyner.com |     | primary plex server |
-|                                 |     |                     |
+| unif-01.local.rtyner.com        |     | unifi controller    |
