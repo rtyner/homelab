@@ -1,0 +1,34 @@
+---
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+      
+  - job_name: 'docker_host'
+    static_configs:
+      - targets: ['10.1.1.7:9100']  # Node exporter on Docker host
+        labels:
+          host: docker_host
+          
+  - job_name: 'debian_servers'
+    static_configs:
+      - targets: []  # Add your Debian servers with node_exporter here
+        labels:
+          os: debian
+          
+  - job_name: 'windows_servers'
+    static_configs:
+      - targets: []  # Add your Windows servers with windows_exporter here
+        labels:
+          os: windows
+          
+  - job_name: 'hypervisor'
+    static_configs:
+      - targets: []  # Add your Arch Linux hypervisor with node_exporter here
+        labels:
+          role: hypervisor
+          os: arch
