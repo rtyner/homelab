@@ -54,3 +54,6 @@ credentials.yml
 *.csr
 *.p12
 *.pfx
+
+# MacOS
+.DS_Store
