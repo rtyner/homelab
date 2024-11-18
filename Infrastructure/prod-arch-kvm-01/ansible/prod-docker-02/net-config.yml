@@ -1,0 +1,36 @@
+---
+- name: Configure static IP and disable DHCP on Debian 12
+  hosts: 10.1.1.9
+  become: yes
+  tasks:
+  
+    - name: Install netplan (if not already installed)
+      apt:
+        name: netplan.io
+        state: present
+        update_cache: yes
+
+    - name: Release current DHCP lease
+      command: dhclient -r
+      ignore_errors: yes  # Ignore errors if DHCP isn't active
+
+    - name: Configure static IP using netplan
+      copy:
+        dest: /etc/netplan/01-netcfg.yaml
+        content: |
+          network:
+            version: 2
+            ethernets:
+              ens3:
+                dhcp4: no
+                addresses: 
+                  - 10.1.1.8/24
+                gateway4: 10.1.1.1
+                nameservers:
+                  addresses:
+                    - 10.1.1.10
+                    - 10.1.1.11
+                    - 1.1.1.1
+
+    - name: Apply netplan configuration
+      command: netplan apply

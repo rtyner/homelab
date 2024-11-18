@@ -1,0 +1,52 @@
+# playbook-network.yml
+---
+- name: Configure Static IP on Debian 12
+  hosts: all
+  become: true
+  vars:
+    network_interface: "ens3"  # Common KVM/QEMU interface name
+    netmask: "24"
+    gateway: "10.1.1.1"
+    dns_servers:
+      - "10.1.1.1"
+      # Add additional DNS servers if needed
+      # - "1.1.1.1"
+
+  tasks:
+    - name: Ensure netplan directory exists
+      file:
+        path: /etc/netplan
+        state: directory
+        mode: '0755'
+
+    - name: Get current interface name
+      shell: ip route | grep default | awk '{print $5}'
+      register: current_interface
+      changed_when: false
+      when: network_interface is not defined
+
+    - name: Set interface name if not defined
+      set_fact:
+        network_interface: "{{ current_interface.stdout }}"
+      when: network_interface is not defined
+
+    - name: Create netplan configuration
+      template:
+        src: templates/01-netcfg.yaml.j2
+        dest: /etc/netplan/01-netcfg.yaml
+        mode: '0644'
+      notify: apply netplan
+
+    - name: Remove cloud-init networking config if exists
+      file:
+        path: /etc/netplan/50-cloud-init.yaml
+        state: absent
+      notify: apply netplan
+
+  handlers:
+    - name: apply netplan
+      shell: |
+        netplan generate
+        netplan apply
+      register: netplan_result
+      failed_when: netplan_result.rc != 0
