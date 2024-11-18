@@ -1,6 +1,0 @@
----
-[docker_host]
-docker.homelab ansible_host=10.1.1.7
-
-[docker_host:vars]
-ansible_python_interpreter=/usr/bin/python3
