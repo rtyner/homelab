@@ -32,5 +32,9 @@ resource "proxmox_vm_qemu" "master-deployment" {
 
     ipconfig0 = "ip=${each.value.ip_address}/24,gw=10.1.1.1"
     ciuser = var.ciuser
-    sshkeys = file("~/.ssh/id_ed25519.pub")    
+    sshkeys = file("~/.ssh/id_ed25519.pub")
+    
+    provisioner "local-exec" {
+        command = "ansible-playbook -i ${each.value.ip_address}, ../ansible/playbooks/base-config.yml"
+    }        
 }

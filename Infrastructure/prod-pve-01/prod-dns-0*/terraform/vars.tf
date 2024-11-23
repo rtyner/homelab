@@ -24,34 +24,37 @@ variable "pm_api_token_secret" {
 
 variable "vms" {
     type = map(object({
-      name       = string
-      ip_address = string
-      cores      = number 
-      sockets    = number
-      vmid       = number
-      memory     = number #mb
-      disk_space = number #gb 
+      name          = string
+      ip_address    = string
+      cores         = number 
+      sockets       = number
+      vmid          = number
+      memory        = number #mb
+      disk_space    = number #gb 
+      start_at_boot = bool
     }))
   
   default = {
     prod-dns-01 = {
-        name = "prod-dns-01"
-        ip_address = "10.1.1.10"
-        cores = 2
-        sockets = 1
-        memory = 2048
-        disk_space = 16
-        vmid = 107
+        name          = "prod-dns-01"
+        ip_address    = "10.1.1.98"
+        cores         = 2
+        sockets       = 1
+        memory        = 2048
+        disk_space    = 16
+        vmid          = 107
+        start_at_boot = true
     }
     
     prod-dns-02 = {
-        name = "prod-dns-02"
-        ip_address = "10.1.1.11"
-        cores = 2
-        sockets = 1
-        memory = 2048
-        disk_space = 16
-        vmid = 108
+        name          = "prod-dns-02"
+        ip_address    = "10.1.1.99"
+        cores         = 2
+        sockets       = 1
+        memory        = 2048
+        disk_space    = 16
+        vmid          = 108
+        start_at_boot = true
     }    
   }
 }
