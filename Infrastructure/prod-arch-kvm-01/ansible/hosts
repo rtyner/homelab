@@ -1,3 +1,8 @@
+[k3s]
+10.1.1.50
+10.1.1.51
+10.1.1.52
+10.1.1.53
 
 [dns]
 prod-dns-01.local.rtyner.com
@@ -15,9 +20,7 @@ prod-docker-03.local.rtyner.com
 prod-docker-01.local.rtyner.com
 prod-docker-02.local.rtyner.com
 prod-docker-03.local.rtyner.com
-10.1.1.7
-10.1.1.8
-10.1.1.9
+
 
 [arch]
 
