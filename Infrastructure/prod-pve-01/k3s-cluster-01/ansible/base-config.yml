@@ -1,6 +1,6 @@
 ---
 
-- hosts: 10.1.1.7
+- hosts: k3s
   become: true
   roles:
   - role: artis3n.tailscale
