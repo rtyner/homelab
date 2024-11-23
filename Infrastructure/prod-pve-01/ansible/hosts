@@ -4,27 +4,15 @@
 10.1.1.52
 10.1.1.53
 
-[dns]
-prod-dns-01.local.rtyner.com
-prod-dns-02.local.rtyner.com
+[docker]
+10.1.1.16
+10.1.1.17
 
 [servers]
-prod-dns-01.local.rtyner.com
-prod-dns-02.local.rtyner.com
-prod-docker-01.local.rtyner.com
-prod-docker-02.local.rtyner.com
-prod-docker-03.local.rtyner.com
-
-
-[docker]
-prod-docker-01.local.rtyner.com
-prod-docker-02.local.rtyner.com
-prod-docker-03.local.rtyner.com
-10.1.1.7
-10.1.1.8
-10.1.1.9
-
-[arch]
-
-[windows]
-
+10.1.1.15
+10.1.1.16
+10.1.1.17
+10.1.1.50
+10.1.1.51
+10.1.1.52
+10.1.1.53
