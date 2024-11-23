@@ -17,14 +17,19 @@
 
 # Hosts
 
-| hostname                     | ip                 | function           |
-| ---------------------------- | ------------------ | ------------------ |
-| usg.local.rtyner.com         | 10.1.1.1           | primary firewall   |
-| prod-pve-01.local.rtyner.com | 10.1.1.2, 10.1.1.3 | proxmox hypervisor |
-| prod-k3s-cls01-master-01     | 10.1.1.50          | k3s master         |
-| prod-k3s-cls01-worker-01     | 10.1.1.51          | k3s worker         |
-| prod-k3s-cls01-worker-02     | 10.1.1.52          | k3s worker         |
-| prod-k3s-cls01-worker-03     | 10.1.1.53          | k3s worker         |
+| hostname       | ip                 | function           |
+| -------------- | ------------------ | ------------------ |
+| usg            | 10.1.1.1           | primary firewall   |
+| prod-pve-01    | 10.1.1.2, 10.1.1.3 | proxmox hypervisor |
+| prod-pg-01     | 10.1.1.15          | postgres server    |
+| prod-docker-01 | 10.1.1.16          | docker server 01   |
+| prod-docker-02 | 10.1.1.17          | docker server 02   |
+| prod-pg-01     |                    |                    |
+
+| prod-k3s-cls01-master-01 | 10.1.1.50          | k3s master         |
+| prod-k3s-cls01-worker-01 | 10.1.1.51          | k3s worker         |
+| prod-k3s-cls01-worker-02 | 10.1.1.52          | k3s worker         |
+| prod-k3s-cls01-worker-03 | 10.1.1.53          | k3s worker         |
 
 # Containers
 | hostname                        | ip  | function            |
