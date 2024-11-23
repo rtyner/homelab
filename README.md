@@ -33,8 +33,6 @@
 
 | hostname                 | ip        | host   | function         |
 | ------------------------ | --------- | ------ | ---------------- |
-| prod-dns-01              | 10.1.1.10 | pve-01 | primary dns      |
-| prod-dns-02              | 10.1.1.11 | pve-02 | secondary dns    |
 | prod-pg-01               | 10.1.1.15 | pve-01 | postgres server  |
 | prod-docker-01           | 10.1.1.16 | pve-01 | docker server 01 |
 | prod-docker-02           | 10.1.1.17 | pve-01 | docker server 02 |
@@ -42,6 +40,8 @@
 | prod-k3s-cls01-worker-01 | 10.1.1.51 | pve-01 | k3s worker       |
 | prod-k3s-cls01-worker-02 | 10.1.1.52 | pve-01 | k3s worker       |
 | prod-k3s-cls01-worker-03 | 10.1.1.53 | pve-01 | k3s worker       |
+| prod-dns-01              | 10.1.1.98 | pve-01 | primary dns      |
+| prod-dns-02              | 10.1.1.99 | pve-02 | secondary dns    |
 
 # Containers
 | container name          | hostname                    | host           | function            | ports     |
