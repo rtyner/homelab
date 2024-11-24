@@ -28,8 +28,14 @@ authorized_keys
 *.password
 *.pwd
 *secret*
-.env
-.env.*
+*private*
+*key*
+*token*
+*api*
+*pass*
+*auth*
+.env*
+*smbcreds*
 credentials.yml
 *credentials*
 
@@ -46,7 +52,6 @@ credentials.yml
 *.bak
 *.backup
 *-backup
-
 
 # Certificate files
 *.crt
