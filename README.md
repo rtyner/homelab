@@ -26,30 +26,32 @@
 | prod-usg-01.local.rtyner.com     | 10.1.1.1          | primary firewall                |
 | prod-pve-01.local.rtyner.com     | 10.1.1.2,10.1.1.3 | proxmox hypervisor              |
 | prod-pve-02.local.rtyner.com     | 10.1.1.4          | proxmox hypervisor              |
-| prod-arch-kvm-01                 | 10.1.1.5          | arch linux kvm hypervisor       |
+| prod-pve-03.local.rtyner.com     | 10.1.1.5          | proxmox hypervisor              |
 | prod-truenas-01.local.rtyner.com | 10.1.1.6          | truenas storage server smb, nfs |
 
 # VMs
 
-| hostname                 | ip        | host   | function         |
-| ------------------------ | --------- | ------ | ---------------- |
-| prod-pg-01               | 10.1.1.15 | pve-01 | postgres server  |
-| prod-docker-01           | 10.1.1.16 | pve-01 | docker server 01 |
-| prod-docker-02           | 10.1.1.17 | pve-01 | docker server 02 |
-| prod-k3s-cls01-master-01 | 10.1.1.50 | pve-01 | k3s master       |
-| prod-k3s-cls01-worker-01 | 10.1.1.51 | pve-01 | k3s worker       |
-| prod-k3s-cls01-worker-02 | 10.1.1.52 | pve-01 | k3s worker       |
-| prod-k3s-cls01-worker-03 | 10.1.1.53 | pve-01 | k3s worker       |
-| prod-dns-01              | 10.1.1.98 | pve-01 | primary dns      |
-| prod-dns-02              | 10.1.1.99 | pve-02 | secondary dns    |
+| hostname                 | ip        | host        | function              |
+| ------------------------ | --------- | ----------- | --------------------- |
+| prod-backup-01           | 10.1.1.14 | prod-pve-03 | proxmox backup server |
+| prod-pg-01               | 10.1.1.15 | pve-01      | postgres server       |
+| prod-docker-01           | 10.1.1.16 | pve-01      | docker server 01      |
+| prod-docker-02           | 10.1.1.17 | pve-01      | docker server 02      |
+| prod-k3s-cls01-master-01 | 10.1.1.50 | pve-01      | k3s master            |
+| prod-k3s-cls01-worker-01 | 10.1.1.51 | pve-01      | k3s worker            |
+| prod-k3s-cls01-worker-02 | 10.1.1.52 | pve-01      | k3s worker            |
+| prod-k3s-cls01-worker-03 | 10.1.1.53 | pve-01      | k3s worker            |
+| prod-dns-01              | 10.1.1.98 | pve-01      | primary dns           |
+| prod-dns-02              | 10.1.1.99 | pve-02      | secondary dns         |
 
 # Containers
-| container name          | hostname                    | host           | function            | ports     |
-| ----------------------- | --------------------------- | -------------- | ------------------- | --------- |
-| plex                    | plex.local.rtyner.com       | prod-docker-02 | primary plex server |           |
-|                         | unif-01.local.rtyner.com    | prod-docker-01 | unifi controller    |           |
-| cloudflare-tunnel       | cloudflared                 | prod-docker-01 | cloudflare tunnel   | 8081      |
-| linkwarden-linkwarden-1 | linkwarden.local.rtyner.com | prod-docker-01 | bookmarks manager   | 3000      |
-| linkwarden-postgres-1   |                             | prod-docker-01 | linkwarden db       | 5432      |
-| nginx-proxy-manager     | npm-01.local.rtyner.com     | prod-docker-01 | nginx proxy manager | 80,81,443 |
-|                         |                             |                |                     |           |
+| container name      | hostname                   | host           | function             | ports          |
+| ------------------- | -------------------------- | -------------- | -------------------- | -------------- |
+| plex                | plex.local.rtyner.com      | prod-docker-02 | primary plex server  |                |
+|                     | unif-01.local.rtyner.com   | prod-docker-01 | unifi controller     |                |
+| cloudflare-tunnel   | cloudflared                | prod-docker-01 | cloudflare tunnel    | 8081           |
+| nginx-proxy-manager | npm-01.local.rtyner.com    | prod-docker-01 | nginx proxy manager  | 80,81,443      |
+| dashy               | dash.local.rtyner.com      | prod-docker-01 | dashboard            | 4000           |
+| portainer           | portainer.local.rtyner.com | prod-docker-01 | container management | 8000,9000,9443 |
+| linkding            | bookmarks.local.rtyner.com | prod-docker-01 | bookmark manager     | 9090           |
+|                     |                            |                |                      |                |
