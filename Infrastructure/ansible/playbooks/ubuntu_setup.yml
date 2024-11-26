@@ -1,0 +1,71 @@
+---
+
+- hosts: docker
+  become: true
+  roles:
+    - geerlingguy.node_exporter
+    - artis3n.tailscale
+  vars:
+    - tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
+  tasks:
+  
+  - name: nopasswd sudo
+    lineinfile:
+        path: /etc/sudoers
+        state: present
+        backup: yes
+        regexp: '^%sudo'
+        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+        
+  - name: disable root login
+    lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        backup: yes        
+        regexp: '^PermitRootLogin'
+        line: "PermitRootLogin no"
+
+  - name: restart ssh
+    service:
+      name: ssh
+      state: restarted
+
+  - name: allow ssh
+    ufw:
+      rule: allow
+      port: 22
+      proto: tcp
+
+  - name: allow all access from local range ufw
+    ufw:
+      rule: allow
+      src: 10.0.0.0/8
+
+  - name: bashrc
+    get_url: 
+      url: https://raw.githubusercontent.com/rtyner/dotfiles/main/thinkpad/.bashrc
+      dest: /home/rt/.bashrc
+
+  - name: standard packages
+    apt:
+      pkg: 
+      - vim
+      - git
+      - gpg
+      - htop
+      - curl
+      - unzip
+      - rsync
+      - rclone
+      - dnsutils
+      - nfs-common
+      - cifs-utils      
+      - python3-pip
+      - build-essential
+      - python3-setuptools
+      update_cache: yes
+      force_apt_get: True
+      name: "*"
+      state: latest
+      autoremove: yes
