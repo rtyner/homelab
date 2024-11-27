@@ -1,1 +1,0 @@
-Add-Computer -ComputerName (Get-Content hosts.txt) -DomainName win.lab -Credential win.lab\rt-admin -Restart
