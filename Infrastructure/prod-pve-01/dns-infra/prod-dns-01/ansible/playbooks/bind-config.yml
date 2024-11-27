@@ -1,0 +1,19 @@
+- name: Install and configure Bind9 DNS server
+  hosts: dns_servers
+  become: yes
+  vars:
+    domain: "local.rtyner.com"
+    reverse_zone: "1.1.10.in-addr.arpa"
+    
+  tasks:
+    - name: Install Bind9 packages
+      apt:
+        name: 
+          - bind9
+          - bind9utils
+        state: present
+
+    - name: Configure named.conf.options
+      template:
+        src: named.conf.options.j2
+        dest: /etc/bind/named.conf.options

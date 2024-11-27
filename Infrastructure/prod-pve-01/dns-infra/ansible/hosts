@@ -1,0 +1,7 @@
+[docker]
+prod-docker-01=10.1.1.16
+prod-docker-02=10.1.1.17
+
+[dns]
+prod-dns-01=10.1.1.98
+prod-dns-01=10.1.1.99
