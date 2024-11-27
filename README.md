@@ -19,8 +19,16 @@
   - 1x AMD Ryzen 7 5700X3D
   - 32GB RAM
   - 1x NVIDIA RTX 3060
+  - 1x 2TB Samsung 970 EVO NVMe
+  - 1x 1TB Samsung 850 EVO Sata
+- Lenovo ThinkCentre M92p
+  - Proxmox 8.X
+  - 1x Intel i5-3470T
+  - 16GB RAM
+  - 1x 512GB Samsung 850 EVO NVMe
 
 # Physical Hosts
+
 | hostname                         | ip                | function                        |
 | -------------------------------- | ----------------- | ------------------------------- |
 | prod-usg-01.local.rtyner.com     | 10.1.1.1          | primary firewall                |
@@ -45,6 +53,7 @@
 | prod-dns-02              | 10.1.1.99 | pve-02      | secondary dns         |
 
 # Containers
+
 | container name      | hostname                   | host           | function             | ports          |
 | ------------------- | -------------------------- | -------------- | -------------------- | -------------- |
 | plex                | plex.local.rtyner.com      | prod-docker-02 | primary plex server  |                |
