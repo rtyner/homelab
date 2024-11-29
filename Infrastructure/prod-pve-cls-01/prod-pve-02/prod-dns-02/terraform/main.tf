@@ -1,5 +1,5 @@
 resource "proxmox_vm_qemu" "master-deployment" {
-    target_node = "prod-pve-01"
+    target_node = "prod-pve-02"
     clone = "ubuntu-cloud"
     os_type = "cloudinit"
     scsihw = "virtio-scsi-pci"
