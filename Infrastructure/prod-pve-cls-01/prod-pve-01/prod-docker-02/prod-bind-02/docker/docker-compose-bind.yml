@@ -1,0 +1,23 @@
+services: 
+  bind9:
+    container_name: prod-bind-02
+    image: ubuntu/bind9:latest
+    environment:
+      - TZ=America/New_York
+      - BIND9_USER=root
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+    volumes:
+      - ./config:/etc/bind
+      - ./cache:/var/cache/bind
+      - ./records:/var/lib/bind/
+    restart: always
+    networks:
+      custom_network:
+        ipv4_address: 10.1.1.96
+
+networks:
+  custom_network:
+    name: dns_network_1
+    external: true
