@@ -2,10 +2,6 @@
 
 - hosts: k3s
   become: true
-  roles:
-  - role: artis3n.tailscale
-    vars:
-      tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
   tasks:
 
   - name: nopasswd sudo
