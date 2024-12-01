@@ -10,6 +10,7 @@ $ORIGIN local.rtyner.com.
 
                                     IN      NS      prod-bind-01.local.rtyner.com.
 
+prod-bind-01                        IN      A       10.1.1.96
 prod-bind-01                        IN      A       10.1.1.97
 usg                                 IN      A       10.1.1.1
 prod-pve-01                         IN      A       10.1.1.2
