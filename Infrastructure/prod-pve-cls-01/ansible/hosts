@@ -38,3 +38,6 @@ prod-k3s-cls01-worker-05.local.rtyner.com
 [postgres]
 prod-pg-01.local.rtyner.com
 prod-pg-02.local.rtyner.com
+
+[do]
+198.199.72.78
