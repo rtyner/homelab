@@ -20,6 +20,7 @@ prod-k3s-cls01-worker-05.local.rtyner.com
 prod-dns-01.local.rtyner.com
 prod-dns-02.local.rtyner.com
 dev-ollama-01.local.rtyner.com
+10.1.1.22
 
 [docker]
 prod-docker-01.local.rtyner.com
