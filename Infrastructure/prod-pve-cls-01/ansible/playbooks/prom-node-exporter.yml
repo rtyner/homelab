@@ -1,0 +1,25 @@
+- name: Install Node Exporter
+  hosts: ubuntu
+  become: true
+  tasks:
+    - name: Download and extract node exporter
+      unarchive:
+        src: https://github.com/prometheus/node_exporter/releases/download/v1.7.0/node_exporter-1.7.0.linux-amd64.tar.gz
+        dest: /usr/local/bin
+        remote_src: yes
+        
+    - name: Create node exporter service
+      copy:
+        dest: /etc/systemd/system/node_exporter.service
+        content: |
+          [Unit]
+          Description=Node Exporter
+          After=network.target
+          
+          [Service]
+          Type=simple
+          User=node_exporter
+          ExecStart=/usr/local/bin/node_exporter
+          
+          [Install]
+          WantedBy=multi-user.target
