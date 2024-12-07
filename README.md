@@ -13,6 +13,7 @@ Current tech stack:
 
 - Proxmox
 - TrueNAS
+- BIND
 - Docker
 - Kubernetes
 - Ansible
