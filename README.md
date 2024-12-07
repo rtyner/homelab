@@ -1,3 +1,28 @@
+# Philosphy
+
+The philosphy of this project is to create a homelab that is as close to a production environment as possible. This includes the following:
+
+- High Availability
+  - Clustering of hardware and redundant services
+- Monitoring
+  - Monitoring of all services and hardware through industry standard tools such as Prometheus, Grafana, Loki, and Alertmanager.
+- Automation
+  - Automation of all services and hardware through Ansible, Terraform, and other tools.
+
+Current tech stack:
+
+- Proxmox
+- TrueNAS
+- Docker
+- Kubernetes
+- Ansible
+- Terraform
+- Prometheus
+- Grafana
+- Loki
+- Alertmanager
+- Unifi
+
 # Hardware
 
 - UniFi USG
@@ -72,4 +97,3 @@
 | portainer           | portainer.local.rtyner.com | prod-docker-01 | container management   | 8000,9000,9443 |
 | prod-bind-01        | ns1.local.rtyner.com       | prod-docker-01 | bind9 primary server   | 53             |
 | prod-bind-02        | ns2.local.rtyner.com       | prod-docker-02 | bind9 secondary server | 53             |
-
