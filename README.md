@@ -56,13 +56,12 @@ Current tech stack:
   - 32GB RAM
   - 2x14TB WD Red
   - 2x8TB WD Red
--
 
 # Physical Hosts
 
 | hostname                         | ip                | function                        |
 | -------------------------------- | ----------------- | ------------------------------- |
-| prod-usg-01.local.rtyner.com     | 10.1.1.1          | primary firewall                |
+| fw01.local.rtyner.com            | 10.1.1.1          | primary firewall OPNSense                 |
 | prod-pve-01.local.rtyner.com     | 10.1.1.2,10.1.1.3 | proxmox hypervisor              |
 | prod-pve-03.local.rtyner.com     | 10.1.1.5          | proxmox hypervisor              |
 | prod-truenas-01.local.rtyner.com | 10.1.1.6          | truenas storage server smb, nfs |
