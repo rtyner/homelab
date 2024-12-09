@@ -11,6 +11,7 @@ The philosphy of this project is to create a homelab that is as close to a produ
 
 Current tech stack:
 
+- OPNSense
 - Proxmox
 - TrueNAS
 - BIND
@@ -22,11 +23,14 @@ Current tech stack:
 - Grafana
 - Loki
 - Alertmanager
-- Unifi
 
 # Hardware
 
-- UniFi USG
+- Protectli FW4B
+  - OPNSense
+  - Intel Celeron J3160
+  - 8GB RAM
+  - 120GB SSD
 - Cisco WS-C3560G-24PS POE Gigabit Switch
 - Dell R720 SFF
   - Proxmox 8.X
@@ -35,15 +39,10 @@ Current tech stack:
   - Perc H310 Mini IT Mode
   - 2x1TB Samsung 870 EVO
   - 5x4TB Seagate Ironwolf
-- HP Proliant ML310e
-  - TrueNAS
-  - 32GB RAM
-  - 2x14TB WD Red
-  - 2x8TB WD Red
-- Whitebox Server
+ Whitebox Server
   - Proxmox 8.X
   - 1x AMD Ryzen 7 5700X3D
-  - 32GB RAM
+  - 64GB RAM
   - 1x NVIDIA RTX 3060
   - 1x 2TB Samsung 970 EVO NVMe
   - 1x 1TB Samsung 850 EVO Sata
@@ -52,6 +51,12 @@ Current tech stack:
   - 1x Intel i5-3470T
   - 16GB RAM
   - 1x 512GB Samsung 850 EVO NVMe
+- HP Proliant ML310e
+  - TrueNAS
+  - 32GB RAM
+  - 2x14TB WD Red
+  - 2x8TB WD Red
+-
 
 # Physical Hosts
 
