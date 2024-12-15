@@ -7,6 +7,7 @@ prod-backup-01.local.rtyner.com
 [ubuntu]
 prod-pg-01.local.rtyner.com
 prod-pg-02.local.rtyner.com
+prod-pg-03.local.rtyner.com
 prod-docker-01.local.rtyner.com
 prod-docker-02.local.rtyner.com
 prod-k3s-cls01-master-01.local.rtyner.com
