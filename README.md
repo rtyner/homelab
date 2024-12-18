@@ -1,48 +1,23 @@
-# Philosphy
-
-The philosphy of this project is to create a homelab that is as close to a production environment as possible. This includes the following:
-
-- High Availability
-  - Clustering of hardware and redundant services
-- Monitoring
-  - Monitoring of all services and hardware through industry standard tools such as Prometheus, Grafana, Loki, and Alertmanager.
-- Automation
-  - Automation of all services and hardware through Ansible, Terraform, and other tools.
-
-Current tech stack:
-
-- OPNSense
-- Proxmox
-- TrueNAS
-- BIND
-- Docker
-- Kubernetes
-- Ansible
-- Terraform
-- Prometheus
-- Grafana
-- Loki
-- Alertmanager
-
 # Hardware
 
-- Protectli FW4B
-  - OPNSense
-  - Intel Celeron J3160
-  - 8GB RAM
-  - 120GB SSD
+- UniFi USG
 - Cisco WS-C3560G-24PS POE Gigabit Switch
 - Dell R720 SFF
   - Proxmox 8.X
   - 2x Xeon E5-2640
   - 192GB RAM
   - Perc H310 Mini IT Mode
-  - 2x1TB Samsung 870 EVO
+  - 2x1TB Sasmsung 870 EVO
   - 5x4TB Seagate Ironwolf
- Whitebox Server
+- HP Proliant ML310e
+  - TrueNAS
+  - 32GB RAM
+  - 2x14TB WD Red
+  - 2x8TB WD Red
+- Whitebox Server
   - Proxmox 8.X
   - 1x AMD Ryzen 7 5700X3D
-  - 64GB RAM
+  - 32GB RAM
   - 1x NVIDIA RTX 3060
   - 1x 2TB Samsung 970 EVO NVMe
   - 1x 1TB Samsung 850 EVO Sata
@@ -51,18 +26,14 @@ Current tech stack:
   - 1x Intel i5-3470T
   - 16GB RAM
   - 1x 512GB Samsung 850 EVO NVMe
-- HP Proliant ML310e
-  - TrueNAS
-  - 32GB RAM
-  - 2x14TB WD Red
-  - 2x8TB WD Red
 
 # Physical Hosts
 
 | hostname                         | ip                | function                        |
 | -------------------------------- | ----------------- | ------------------------------- |
-| fw01.local.rtyner.com            | 10.1.1.1          | primary firewall OPNSense                 |
+| prod-usg-01.local.rtyner.com     | 10.1.1.1          | primary firewall                |
 | prod-pve-01.local.rtyner.com     | 10.1.1.2,10.1.1.3 | proxmox hypervisor              |
+| prod-pve-02.local.rtyner.com     | 10.1.1.4          | proxmox hypervisor              |
 | prod-pve-03.local.rtyner.com     | 10.1.1.5          | proxmox hypervisor              |
 | prod-truenas-01.local.rtyner.com | 10.1.1.6          | truenas storage server smb, nfs |
 
@@ -71,24 +42,24 @@ Current tech stack:
 | hostname                 | ip        | host        | function                                            |
 | ------------------------ | --------- | ----------- | --------------------------------------------------- |
 | prod-backup-01           | 10.1.1.14 | prod-pve-03 | proxmox backup server                               |
-| prod-pg-01               | 10.1.1.15 | prod-pve-01      | postgres server                                     |
-| prod-docker-01           | 10.1.1.16 | prod-pve-01      | docker server 01                                    |
-| prod-docker-02           | 10.1.1.17 | prod-pve-01      | docker server 02                                    |
-| prod-pg-02               | 10.1.1.18 | prod-pve-01      | postgres server                                     |
-| dev-ollama-01            | 10.1.1.19 | prod-pve-01      | ollama                                              |
-| dev-arch-01              | 10.1.1.20 | prod-pve-01      | linux jump/dev box                                  |
-| prod-file-01             | 10.1.1.21 | prod-pve-01      | nfs file server                                     |
-| prod-monitor-01          | 10.1.1.22 | prod-pve-01      | monitoring server, prometheus, grafana, uptime kuma |
-| prod-k3s-cls01-master-01 | 10.1.1.50 | prod-pve-01      | k3s master                                          |
-| prod-k3s-cls01-master-02 | 10.1.1.51 | prod-pve-01      | k3s master                                          |
-| prod-k3s-cls01-master-03 | 10.1.1.52 | prod-pve-03      | k3s master                                          |
+| prod-pg-01               | 10.1.1.15 | pve-01      | postgres server                                     |
+| prod-docker-01           | 10.1.1.16 | pve-01      | docker server 01                                    |
+| prod-docker-02           | 10.1.1.17 | pve-01      | docker server 02                                    |
+| prod-pg-02               | 10.1.1.18 | pve-02      | postgres server                                     |
+| dev-ollama-01            | 10.1.1.19 | pve-02      | ollama                                              |
+| dev-arch-01              | 10.1.1.20 | pve-02      | linux jump/dev box                                  |
+| prod-file-01             | 10.1.1.21 | pve-01      | nfs file server                                     |
+| prod-monitor-01          | 10.1.1.22 | pve-02      | monitoring server, prometheus, grafana, uptime kuma |
+| prod-k3s-cls01-master-01 | 10.1.1.50 | pve-01      | k3s master                                          |
+| prod-k3s-cls01-master-02 | 10.1.1.51 | pve-02      | k3s master                                          |
+| prod-k3s-cls01-master-03 | 10.1.1.52 | pve-03      | k3s master                                          |
 | prod-k3s-cls01-worker-01 | 10.1.1.53 | prod-pve-01 | k3s worker                                          |
 | prod-k3s-cls01-worker-02 | 10.1.1.54 | prod-pve-01 | k3s worker                                          |
-| prod-k3s-cls01-worker-03 | 10.1.1.55 | prod-pve-01 | k3s worker                                          |
+| prod-k3s-cls01-worker-03 | 10.1.1.55 | prod-pve-02 | k3s worker                                          |
 | prod-k3s-cls01-worker-04 | 10.1.1.56 | prod-pve-03 | k3s worker                                          |
 | prod-k3s-cls01-worker-05 | 10.1.1.57 | prod-pve-03 | k3s worker                                          |
-| prod-dns-01              | 10.1.1.98 | prod-pve-01      | primary dns                                         |
-| prod-dns-02              | 10.1.1.99 | prod-pve-01      | secondary dns                                       |
+| prod-dns-01              | 10.1.1.98 | pve-01      | primary dns                                         |
+| prod-dns-02              | 10.1.1.99 | pve-02      | secondary dns                                       |
 
 # Containers
 
