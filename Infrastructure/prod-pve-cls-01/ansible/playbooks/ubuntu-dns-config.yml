@@ -1,0 +1,22 @@
+---
+- hosts: ububntu
+  become: true
+  tasks:
+    - name: set dns servers
+      community.general.resolvectl:
+        iface: eth0  
+        dns:
+          - 10.1.1.96
+          - 10.1.1.97
+
+    - name: set search domains using resolvectl
+      community.general.resolvectl:
+        iface: eth0  
+        domain:
+          - ~.
+          - local.rtyner.com
+
+    - name: restart systemd-resolved
+      service:
+        name: systemd-resolved
+        state: restarted
