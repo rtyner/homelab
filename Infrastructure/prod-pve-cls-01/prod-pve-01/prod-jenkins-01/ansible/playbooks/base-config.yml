@@ -1,0 +1,59 @@
+---
+- name: Ubuntu 24.04 Base Config
+  hosts: all
+  become: true
+  tasks:
+    - name: Enable nopasswd sudo for user
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        backup: true
+        regexp: '^%sudo'
+        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+        
+    - name: Disable root login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        backup: true
+        regexp: '^PermitRootLogin'
+        line: "PermitRootLogin no"
+
+    - name: Restart ssh service
+      service:
+        name: ssh
+        state: restarted
+  
+    - name: Install standard packages
+      apt:
+        pkg: 
+          - vim
+          - git
+          - gpg
+          - htop
+          - curl
+          - unzip
+          - rsync
+          - rclone
+          - dnsutils
+          - nfs-common
+          - python3-pip
+          - build-essential
+          - python3-setuptools
+          - prometheus-node-exporter
+        update_cache: yes
+
+    - name: Create a new regular user with sudo privileges
+      user:
+        name: rt
+        state: present
+        groups: sudo
+        append: true
+        create_home: true
+        
+    - name: Clone bashrc
+      get_url:
+        url: https://raw.githubusercontent.com/rtyner/homelab/refs/heads/main/dotfiles/.bashrc
+        dest: /home/rt/.bashrc
+        mode: '0644'
