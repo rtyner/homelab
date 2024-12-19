@@ -23,12 +23,18 @@
 - Deploy Loki
 
 ## Services
-- MinIO
 
+- MinIO
+- ArgoCD
+- DroneCI
+- Gitlab
+- Hashicorp Vault
+- Jenkins
+- PHPIPAM
+- Ansible Tower
 ## Networking
 
-- New router
-- VLANs
+- Configure VLANs on switch and firewall
 
 ## Automation
 
@@ -45,6 +51,6 @@
 - 3x hosts
   - 192GB RAM
   - 2x 16c CPU
-  - 2x 2TB OS SSD
-  - 5x 2TB data SSD
+  - 1TB OS SSD
+  - 4TB Data SSD
   - 40Gbe networking
