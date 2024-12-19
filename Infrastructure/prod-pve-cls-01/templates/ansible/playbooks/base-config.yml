@@ -1,0 +1,85 @@
+---
+- name: Base Config
+  hosts: all
+  become: true
+  tasks:
+
+  - name: Update apt cache
+    apt:
+      update_cache: yes
+
+  - name: Upgrade all packages
+    apt:
+      upgrade: yes
+
+  - name: Set DNS servers for eth0
+    command: resolvectl dns eth0 10.1.1.96 10.1.1.97
+    changed_when: true
+
+  - name: Set DNS search domains for eth0
+    command: "resolvectl domain eth0 '~.' local.rtyner.com"
+    changed_when: true
+
+  - name: Restart systemd-resolved service
+    systemd:
+      name: systemd-resolved
+      state: restarted
+
+  - name: nopasswd sudo
+    lineinfile:
+        path: /etc/sudoers
+        state: present
+        backup: yes
+        regexp: '^%sudo'
+        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+        
+  - name: disable root login
+    lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        backup: yes        
+        regexp: '^PermitRootLogin'
+        line: "PermitRootLogin no"
+
+  - name: restart ssh
+    service:
+      name: ssh
+      state: restarted
+  
+  - name: standard packages
+    apt:
+      pkg: 
+      - vim
+      - git
+      - gpg
+      - htop
+      - curl
+      - unzip
+      - rsync
+      - rclone
+      - dnsutils
+      - nfs-common
+      - python3-pip
+      - build-essential
+      - python3-setuptools
+      - prometheus-node-exporter
+      update_cache: yes
+
+  - name: Create a new regular user with sudo privileges
+    user:
+      name: rt
+      state: present
+      groups: sudo
+      append: true
+      create_home: true
+        
+  - name: bashrc
+    get_url: 
+      url: https://raw.githubusercontent.com/rtyner/homelab/refs/heads/main/dotfiles/.bashrc
+      dest: /home/rt
+
+  - name: Reboot the system
+    reboot:
+      msg: "System is being rebooted after successful configuration"
+      reboot_timeout: 300
