@@ -1,6 +1,6 @@
 ---
 
-- hosts: do
+- hosts: postgres
   become: true
   tasks:
 
