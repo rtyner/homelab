@@ -50,6 +50,7 @@
 | dev-arch-01              | 10.1.1.20 | pve-02      | linux jump/dev box                                  |
 | prod-file-01             | 10.1.1.21 | pve-01      | nfs file server                                     |
 | prod-monitor-01          | 10.1.1.22 | pve-02      | monitoring server, prometheus, grafana, uptime kuma |
+| prod-pg-03               | 10.1.1.23 | pve-01      | postgres server                                     |
 | prod-k3s-cls01-master-01 | 10.1.1.50 | pve-01      | k3s master                                          |
 | prod-k3s-cls01-master-02 | 10.1.1.51 | pve-02      | k3s master                                          |
 | prod-k3s-cls01-master-03 | 10.1.1.52 | pve-03      | k3s master                                          |
