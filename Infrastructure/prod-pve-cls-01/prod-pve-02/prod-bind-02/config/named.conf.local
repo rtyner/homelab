@@ -1,0 +1,13 @@
+zone "local.rtyner.com" {
+    type secondary;
+    file "/var/cache/bind/db.local.rtyner.com";
+    masters { 10.1.1.96; };  # Primary server IP
+    notify no;
+};
+
+zone "1.1.10.in-addr.arpa" {
+    type secondary;
+    file "/var/cache/bind/db.10.1.1";
+    masters { 10.1.1.96; };  # Primary server IP
+    notify no;
+};

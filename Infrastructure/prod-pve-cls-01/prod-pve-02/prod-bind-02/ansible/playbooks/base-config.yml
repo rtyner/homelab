@@ -4,6 +4,27 @@
   become: true
   tasks:
 
+  - name: Update apt cache
+    apt:
+      update_cache: yes
+
+  - name: Upgrade all packages
+    apt:
+      upgrade: yes
+
+  - name: Set DNS servers for eth0
+    command: resolvectl dns eth0 10.1.1.96 10.1.1.97
+    changed_when: true
+
+  - name: Set DNS search domains for eth0
+    command: "resolvectl domain eth0 '~.' local.rtyner.com"
+    changed_when: true
+
+  - name: Restart systemd-resolved service
+    systemd:
+      name: systemd-resolved
+      state: restarted
+
   - name: nopasswd sudo
     lineinfile:
         path: /etc/sudoers
@@ -58,3 +79,7 @@
       url: https://raw.githubusercontent.com/rtyner/homelab/refs/heads/main/dotfiles/.bashrc
       dest: /home/rt
 
+  - name: Reboot the system
+    reboot:
+      msg: "System is being rebooted after successful configuration"
+      reboot_timeout: 300

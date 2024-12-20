@@ -1,0 +1,31 @@
+;
+; BIND data file for local.rtyner.com
+;
+$TTL    604800
+@       IN      SOA     prod-bind-01.local.rtyner.com. dns@rtyner.com. (
+                        {{ ansible_date_time.epoch }}  ; Serial
+                        12h         ; Refresh
+                        15m         ; Retry
+                        3w          ; Expire
+                        2h )        ; Negative Cache TTL
+
+; Name servers
+@       IN      NS      prod-bind-01.local.rtyner.com.
+@       IN      NS      prod-bind-02.local.rtyner.com.
+
+; A records
+prod-bind-01.local.rtyner.com.              IN      A       10.1.1.96
+prod-bind-02.local.rtyner.com.              IN      A       10.1.1.97
+{% for record in dns_records %}
+{{ record.hostname }}.local.rtyner.com.     IN      A       {{ record.ip }}
+{% endfor %}
+
+; CNAME records
+{% for cname in cname_records | default([]) %}
+{{ cname.alias }}.local.rtyner.com.         IN      CNAME   {{ cname.target }}.local.rtyner.com.
+{% endfor %}
+
+; Wildcard records
+{% for wildcard in wildcard_records | default([]) %}
+*.{{ wildcard.hostname }}.local.rtyner.com.  IN      A       {{ wildcard.ip }}
+{% endfor %}

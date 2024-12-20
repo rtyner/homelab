@@ -30,6 +30,7 @@ prod-truenas-01
 
 [arch]
 dev-arch-01
+dev-ollama-01
 
 [pve]
 prod-pve-01
@@ -75,8 +76,9 @@ prod-k3s-cls01-worker-03
 prod-k3s-cls01-worker-04 
 prod-k3s-cls01-worker-05 
 
-[dns]
-prod-dns-01              
-prod-dns-02              
-prod-bind-01
-prod-bind-02
+[dns_servers]
+prod-bind-01 ansible_host=10.1.1.96
+prod-bind-02 ansible_host=10.1.1.97
+
+[primary_dns]
+prod-bind-01 ansible_host=10.1.1.96

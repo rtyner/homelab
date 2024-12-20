@@ -31,7 +31,7 @@
 
 | hostname                         | ip                | function                        |
 | -------------------------------- | ----------------- | ------------------------------- |
-| prod-usg-01.local.rtyner.com     | 10.1.1.1          | primary firewall                |
+| prod-fw-01.local.rtyner.com      | 10.1.1.1          | primary firewall                |
 | prod-pve-01.local.rtyner.com     | 10.1.1.2,10.1.1.3 | proxmox hypervisor              |
 | prod-pve-02.local.rtyner.com     | 10.1.1.4          | proxmox hypervisor              |
 | prod-pve-03.local.rtyner.com     | 10.1.1.5          | proxmox hypervisor              |
