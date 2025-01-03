@@ -1,0 +1,60 @@
+.
+├── dirs.txt
+├── environments
+│   ├── dev
+│   └── prod
+│       ├── database
+│       │   └── main.tf
+│       ├── dns
+│       ├── docker
+│       └── kubernetes
+├── global
+│   ├── providers.tf
+│   └── terraform.tfvars
+└── modules
+    ├── README.md
+    ├── dns
+    │   ├── main.tf
+    │   └── vars.tf
+    ├── docker-hosts
+    │   ├── main.tf
+    │   └── vars.tf
+    ├── file-server
+    │   ├── main.tf
+    │   └── vars.tf
+    ├── kubernetes
+    ├── monitoring
+    │   ├── main.tf
+    │   └── vars.tf
+    ├── postgres-cluster
+    │   ├── main.tf
+    │   └── vars.tf
+    └── server-deployments
+        ├── dev-ollama-01
+        │   └── terraform
+        │       ├── main.tf
+        │       └── vars.tf
+        ├── prod-aptcache-01
+        │   └── terraform
+        │       ├── main.tf
+        │       └── vars.tf
+        ├── prod-backup-01
+        ├── prod-caddy-01
+        │   ├── main.tf
+        │   └── vars.tf
+        ├── prod-file-01
+        ├── prod-gitlab-01
+        │   ├── main.tf
+        │   └── vars.tf
+        ├── prod-jenkins-01
+        │   ├── main.tf
+        │   └── vars.tf
+        ├── prod-monitor-01
+        ├── prod-nocodb-01
+        │   ├── main.tf
+        │   └── vars.tf
+        └── prod-unifi-01
+            ├── main.tf
+            └── vars.tf
+
+29 directories, 29 files

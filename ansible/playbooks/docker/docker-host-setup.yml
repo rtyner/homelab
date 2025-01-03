@@ -1,0 +1,235 @@
+---
+- name: Configure Docker Host
+  hosts: all
+  become: true
+  vars:
+    docker_data_dir: /var/lib/docker
+    docker_storage_driver: overlay2
+    docker_log_driver: json-file
+    docker_users: ["rt"]
+    docker_max_container_log_size: "10m"
+    docker_max_container_log_files: 3
+    docker_interface: docker0
+    docker_subnet: 172.17.0.0/16
+
+  tasks:
+    - name: Install required system packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+          - python3-setuptools
+          - fail2ban
+          - chrony
+          - iptables-persistent
+        state: present
+        update_cache: yes
+
+    - name: Ensure UFW is installed
+      apt:
+        name: ufw
+        state: present
+        update_cache: yes
+
+    - name: Check UFW status
+      command: ufw status
+      register: ufw_status
+      changed_when: false
+
+    - name: Set up separate partition for Docker data
+      filesystem:
+        fstype: ext4
+        dev: /dev/sdb
+        opts: -L dockerdata
+      when: ansible_devices.sdb is defined
+
+    - name: Create Docker data directory
+      file:
+        path: "{{ docker_data_dir }}"
+        state: directory
+        mode: '0711'
+
+    - name: Mount Docker data partition
+      mount:
+        path: "{{ docker_data_dir }}"
+        src: LABEL=dockerdata
+        fstype: ext4
+        opts: defaults,noatime
+        state: mounted
+      when: ansible_devices.sdb is defined
+
+    - name: Configure Docker daemon
+      template:
+        src: daemon.json.j2
+        dest: /etc/docker/daemon.json
+        mode: '0644'
+      notify: restart docker
+
+    - name: Configure system settings for Docker
+      sysctl:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        state: present
+        sysctl_file: /etc/sysctl.d/99-docker.conf
+      with_items:
+        - { name: 'net.ipv4.ip_forward', value: '1' }
+        - { name: 'net.bridge.bridge-nf-call-iptables', value: '1' }
+        - { name: 'net.bridge.bridge-nf-call-ip6tables', value: '1' }
+        - { name: 'vm.max_map_count', value: '262144' }
+        - { name: 'fs.file-max', value: '1000000' }
+
+    - name: Reset UFW to default
+      command: ufw --force reset
+      when: ufw_status.rc != 0
+
+    - name: Configure default UFW policies
+      ufw:
+        default: "{{ item.policy }}"
+        direction: "{{ item.direction }}"
+      loop:
+        - { direction: 'incoming', policy: 'deny' }
+        - { direction: 'outgoing', policy: 'allow' }
+      notify: enable ufw
+
+    - name: Allow SSH access
+      ufw:
+        rule: allow
+        port: 22
+        proto: tcp
+      notify: enable ufw
+
+    - name: Configure Docker-specific UFW rules
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - 2376  # Docker TLS
+        - 2377  # Docker Swarm cluster management
+        - 7946  # Container network discovery
+        - 4789  # Container overlay network
+        - 9323  # Docker metrics for Prometheus
+      notify: enable ufw
+
+    - name: Allow UDP ports for Docker Swarm
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: udp
+      loop:
+        - 7946  # Container network discovery
+        - 4789  # Container overlay network
+      notify: enable ufw
+
+    - name: Create Docker UFW rules file
+      copy:
+        dest: /etc/ufw/applications.d/docker
+        content: |
+          [Docker]
+          title=Docker Container Management
+          description=Docker container management ports
+          ports=2375,2376,2377,7946,4789/tcp|7946,4789/udp
+
+    - name: Configure UFW forward policy
+      copy:
+        dest: /etc/default/ufw
+        content: |
+          IPV6=yes
+          DEFAULT_INPUT_POLICY="DROP"
+          DEFAULT_OUTPUT_POLICY="ACCEPT"
+          DEFAULT_FORWARD_POLICY="ACCEPT"
+          DEFAULT_APPLICATION_POLICY="SKIP"
+          MANAGE_BUILTINS=no
+          IPT_SYSCTL=/etc/ufw/sysctl.conf
+          IPT_MODULES="nf_conntrack_ftp nf_nat_ftp nf_conntrack_netbios_ns"
+
+    - name: Create Docker UFW rules
+      copy:
+        dest: /etc/ufw/before.rules
+        content: |
+          *filter
+          :ufw-user-forward - [0:0]
+          :ufw-docker-logging-deny - [0:0]
+          :DOCKER-USER - [0:0]
+          
+          # Allow all forwarding for docker
+          -A DOCKER-USER -j RETURN
+          COMMIT
+          
+          *nat
+          :POSTROUTING ACCEPT [0:0]
+          
+          # Forward traffic through docker interface
+          -A POSTROUTING -s {{ docker_subnet }} ! -o {{ docker_interface }} -j MASQUERADE
+          COMMIT
+
+    - name: Enable UFW logging
+      ufw:
+        logging: 'on'
+      notify: enable ufw
+
+    - name: Configure fail2ban for Docker daemon
+      copy:
+        dest: /etc/fail2ban/jail.d/docker-daemon.conf
+        content: |
+          [docker-daemon]
+          enabled = true
+          filter = docker-daemon
+          logpath = /var/log/docker.log
+          maxretry = 5
+          findtime = 600
+          bantime = 3600
+          action = iptables-allports
+
+    - name: Set up Docker daemon metrics for Prometheus
+      template:
+        src: prometheus-docker.json.j2
+        dest: /etc/docker/daemon.json
+        mode: '0644'
+      notify: restart docker
+
+    - name: Configure logrotate for Docker
+      copy:
+        dest: /etc/logrotate.d/docker
+        content: |
+          /var/lib/docker/containers/*/*.log {
+              rotate 7
+              daily
+              compress
+              delaycompress
+              copytruncate
+              missingok
+              maxsize 100M
+          }
+
+    - name: Create Docker cleanup script
+      copy:
+        dest: /usr/local/bin/docker-cleanup
+        mode: '0755'
+        content: |
+          #!/bin/bash
+          # Remove unused containers, networks, images, and volumes
+          docker system prune -af --volumes
+          # Remove old container logs
+          find /var/lib/docker/containers/ -type f -name "*.log" -mtime +7 -delete
+
+    - name: Set up Docker cleanup cron job
+      cron:
+        name: "Docker cleanup"
+        hour: "3"
+        minute: "0"
+        job: "/usr/local/bin/docker-cleanup"
+
+  handlers:
+    - name: restart docker
+      service:
+        name: docker
+        state: restarted
+
+    - name: enable ufw
+      ufw:
+        state: enabled
+        force: true

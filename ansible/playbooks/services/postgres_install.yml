@@ -1,0 +1,48 @@
+---
+- hosts: prod-pg-01.local.rtyner.com
+  become: yes
+  vars:
+    postgres_version: 17
+    database_name: home-inventory
+    database_user: rt-inventory
+    database_password: "{{ lookup('env', 'PGPW') }}"
+
+  tasks:
+  - name: Install PostgreSQL
+    apt:
+      name: postgresql-{{ postgres_version }}
+      state: present
+
+  - name: configure postgres listen address
+    lineinfile:
+      path: /etc/postgresql/{{ postgres_version }}/main/postgresql.conf
+      regexp: '^#?listen_addresses = .*'
+      line: 'listen_addresses = "*"'
+      state: present
+        
+  - name: Create database
+    become_user: postgres
+    postgresql_db:
+      name: "{{ database_name }}"
+      state: present
+
+  - name: Create user
+    become_user: postgres
+    postgresql_user:
+      db: "{{ database_name }}"
+      name: "{{ database_user }}"
+      password: "{{ database_password }}"
+      priv: "{{ database_name }}.*:ALL"
+
+  - name: configure password authentication
+    postgresql_pg_hba:
+      type: host
+      database: all
+      user: all
+      address: 0.0.0.0/0
+      method: md5
+
+  - name: Install psycopg2
+    apt:
+      name: python-psycopg2
+      state: present

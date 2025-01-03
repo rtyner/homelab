@@ -1,0 +1,300 @@
+---
+- name: Base Config
+  hosts: all
+  vars:
+    ansible_command_timeout: 300
+    ansible_timeout: 300
+  become: true
+
+  handlers:
+    - name: restart ssh
+      service:
+        name: ssh
+        state: restarted
+
+    - name: restart node_exporter
+      service:
+        name: node_exporter
+        state: restarted      
+
+  tasks:
+    - name: Disable systemd-resolved
+      systemd:
+        name: systemd-resolved
+        state: stopped
+        enabled: false
+        daemon_reload: yes
+      become: true
+
+    - name: Check if resolv.conf is immutable
+      command: lsattr /etc/resolv.conf
+      register: resolv_attrs
+      changed_when: false
+      ignore_errors: true
+    
+    - name: Remove immutable attribute if it exists
+      command: chattr -i /etc/resolv.conf
+      when: "resolv_attrs.stdout is defined and 'i' in resolv_attrs.stdout"
+      ignore_errors: true
+
+    - name: Remove resolv.conf symlink
+      file:
+        path: /etc/resolv.conf
+        state: absent
+      become: true
+    
+    - name: Create custom resolv.conf
+      template:
+        src: resolv.conf.j2
+        dest: /etc/resolv.conf
+        mode: '0644'
+      become: true
+    
+    - name: Make resolv.conf immutable
+      command: chattr +i /etc/resolv.conf
+      become: true
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: yes
+
+    - name: nopasswd sudo
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        backup: yes
+        regexp: '^%sudo'
+        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+        
+    - name: disable root login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        backup: yes        
+        regexp: '^PermitRootLogin'
+        line: "PermitRootLogin no"
+      notify: restart ssh
+  
+    - name: standard packages
+      apt:
+        pkg: 
+          - vim
+          - bat
+          - git
+          - gpg
+          - htop
+          - curl
+          - unzip
+          - rsync
+          - rclone
+          - dnsutils
+          - python3-pip
+          - build-essential
+          - python3-setuptools
+        state: present
+        update_cache: yes
+
+    - name: Check OS family
+      ansible.builtin.set_fact:
+        is_arch: "{{ ansible_facts['os_family'] == 'Archlinux' }}"
+        is_ubuntu: "{{ ansible_facts['os_family'] == 'Debian' }}"
+
+    - name: Install NFS client on Ubuntu
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+          - nfs-common
+          - cifs-utils
+      when: is_ubuntu
+
+    - name: Install NFS client on Arch
+      pacman:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+          - nfs-utils
+          - cifs-utils
+      when: is_arch
+
+    - name: Enable and start NFS services on Arch
+      systemd:
+        name: "{{ item }}"
+        enabled: yes
+        state: started
+      with_items:
+        - nfs-client.target
+        - rpc-statd.service
+      when: is_arch
+
+    - name: Create mount directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: rt
+        group: rt
+        mode: '0755'
+        recurse: yes
+      with_items:
+        - /home/rt/mount/nfs-file-01
+        - /home/rt/mount/nfs-rt
+        - /home/rt/mount/bdp
+        - /home/rt/mount/red
+        - /home/rt/mount/pve4_data
+
+    - name: Create SMB credentials file
+      template:
+        src: smbcreds.j2
+        dest: /home/rt/.smbcreds
+        owner: rt
+        group: rt
+        mode: '0600'
+
+    - name: Configure fstab entries
+      blockinfile:
+        path: /etc/fstab
+        backup: yes
+        block: |
+          10.1.1.7:/data/pve4_data_nfs    /home/rt/mount/pve4_data    nfs    rw,sync,hard,intr    0    0
+          10.1.1.6:/mnt/pool-1-14t/rt /home/rt/mount/nfs-rt nfs rw,sync,hard,intr 0 0
+          10.1.1.21:/datapool/nfs     /home/rt/mount/nfs-file-01    nfs    rw,sync,hard,intr    0    0
+          //10.1.1.6/big-dick-pool    /home/rt/mount/bdp           cifs   credentials=/home/rt/.smbcreds,uid=rt,gid=rt,file_mode=0755,dir_mode=0755    0    0
+          //10.1.1.6/red-share        /home/rt/mount/red           cifs   credentials=/home/rt/.smbcreds,uid=rt,gid=rt,file_mode=0755,dir_mode=0755    0    0
+
+    - name: Mount all shares
+      mount:
+        path: "{{ item.path }}"
+        src: "{{ item.src }}"
+        fstype: "{{ item.fstype }}"
+        opts: "{{ item.opts }}"
+        state: mounted
+      with_items:
+        - { path: '/home/rt/mount/pve4_data', src: '10.1.1.7:/data/pve4_data_nfs', fstype: 'nfs', opts: 'rw,sync,hard,intr' }
+        - { path: '/home/rt/mount/nfs-rt', src: '10.1.1.6:/mnt/pool-1-14t/rt', fstype: 'nfs', opts: 'rw,sync,hard,intr' }
+        - { path: '/home/rt/mount/nfs-file-01', src: '10.1.1.21:/datapool/nfs', fstype: 'nfs', opts: 'rw,sync,hard,intr' }        
+        - { path: '/home/rt/mount/bdp', src: '//10.1.1.6/big-dick-pool', fstype: 'cifs', opts: 'credentials=/home/rt/.smbcreds,uid=rt,gid=rt,file_mode=0755,dir_mode=0755' }
+        - { path: '/home/rt/mount/red', src: '//10.1.1.6/red-share', fstype: 'cifs', opts: 'credentials=/home/rt/.smbcreds,uid=rt,gid=rt,file_mode=0755,dir_mode=0755' }
+
+    - name: Test mount points
+      command: mountpoint -q "{{ item }}"
+      register: mount_test
+      failed_when: mount_test.rc not in [0, 1]
+      changed_when: false
+      with_items:
+        - /home/rt/mount/nfs-file-01
+        - /home/rt/mount/nfs-rt
+        - /home/rt/mount/bdp
+        - /home/rt/mount/red
+        - /home/rt/mount/pve4_data
+
+    - name: Create node_exporter user
+      user:
+        name: node_exporter
+        system: yes
+        shell: /usr/sbin/nologin
+
+    - name: Check if node exporter binary exists
+      stat:
+        path: /usr/local/bin/node_exporter
+      register: node_exporter_binary
+
+    - name: Check if node exporter service exists
+      stat:
+        path: /etc/systemd/system/node_exporter.service
+      register: node_exporter_service
+
+    - name: Download and extract node exporter
+      unarchive:
+        src: https://github.com/prometheus/node_exporter/releases/download/v1.7.0/node_exporter-1.7.0.linux-amd64.tar.gz
+        dest: /usr/local/bin
+        remote_src: yes
+      when: not node_exporter_binary.stat.exists
+
+    - name: Move node exporter binary
+      copy:
+        src: /usr/local/bin/node_exporter-1.7.0.linux-amd64/node_exporter
+        dest: /usr/local/bin/node_exporter
+        remote_src: yes
+        mode: '0755'
+      when: not node_exporter_binary.stat.exists
+
+    - name: Create node exporter service
+      copy:
+        dest: /etc/systemd/system/node_exporter.service
+        content: |
+          [Unit]
+          Description=Node Exporter
+          After=network.target
+          
+          [Service]
+          Type=simple
+          User=node_exporter
+          ExecStart=/usr/local/bin/node_exporter
+          
+          [Install]
+          WantedBy=multi-user.target
+      when: not node_exporter_service.stat.exists
+      notify: restart node_exporter
+
+    - name: Start and enable node_exporter service
+      systemd:
+        name: node_exporter
+        state: started
+        enabled: yes
+        daemon_reload: yes
+
+    - name: Create a new regular user with sudo privileges
+      user:
+        name: rt
+        state: present
+        groups: sudo
+        append: true
+        create_home: true
+        
+    - name: Install unattended-upgrades package
+      apt:
+        name: unattended-upgrades
+        state: present
+
+    - name: Enable automatic updates
+      debconf:
+        name: unattended-upgrades
+        question: unattended-upgrades/enable_auto_updates
+        vtype: boolean
+        value: 'true'
+
+    - name: Configure unattended-upgrades
+      lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: '^//Unattended-Upgrade::Allowed-Origins', line: 'Unattended-Upgrade::Allowed-Origins { "${distro_id}:${distro_codename}"; "${distro_id}:${distro_codename}-security"; };' }
+        - { regexp: '^//Unattended-Upgrade::Mail "root"', line: 'Unattended-Upgrade::Mail "root@localhost";' }
+        - { regexp: '^//Unattended-Upgrade::Automatic-Reboot "false";', line: 'Unattended-Upgrade::Automatic-Reboot "true";' }
+        - { regexp: '^//Unattended-Upgrade::Remove-Unused-Dependencies "false";', line: 'Unattended-Upgrade::Remove-Unused-Dependencies "true";' }
+
+    - name: Ensure unattended-upgrades service is running
+      service:
+        name: unattended-upgrades
+        state: started
+        enabled: yes
+
+    - name: bashrc
+      get_url: 
+        url: https://raw.githubusercontent.com/rtyner/homelab/refs/heads/main/dotfiles/.bashrc
+        dest: /home/rt
+
+    - name: Reboot the system
+      reboot:
+        msg: "System is being rebooted after successful configuration"
+        reboot_timeout: 300

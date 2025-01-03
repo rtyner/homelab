@@ -1,0 +1,34 @@
+---
+# Default DNS records (your existing records)
+dns_records:
+  - hostname: "prod-fw-01"
+    ip: "10.1.1.1"
+  - hostname: "prod-pve-01"
+    ip: "10.1.1.2"
+  - hostname: "prod-pve-02"
+    ip: "10.1.1.4"
+  - hostname: "prod-pve-03"
+    ip: "10.1.1.5"
+  - hostname: "truenas"
+    ip: "10.1.1.6"
+  - hostname: "prod-backup-01"
+    ip: "10.1.1.14"
+  # ... add all your existing records here
+
+# Default CNAME records
+cname_records:
+  - alias: "backup"
+    target: "prod-backup-01"
+  - alias: "grafana"
+    target: "prod-monitor-01"
+  - alias: "ns1"
+    target: "prod-bind-01"
+  - alias: "ns2"
+    target: "prod-bind-02"
+
+# Default wildcard records
+wildcard_records:
+  - hostname: "prod-docker-01"
+    ip: "10.1.1.16"
+  - hostname: "prod-docker-02"
+    ip: "10.1.1.17"

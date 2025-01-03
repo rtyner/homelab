@@ -1,0 +1,13 @@
+---
+- hosts: k3s
+  become: "true"
+  tasks:
+    - ansible.builtin.debug:
+        msg: play1
+
+
+- import_playbook: ./dns-management/resolv-dns-config.yml
+- import_playbook: base-config.yml
+- import-playbook: enable-unattended-upgrades.yml
+- import_playbook: prom-node-exporter.yml
+- import_playbook: reboot.yml

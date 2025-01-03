@@ -1,0 +1,34 @@
+---
+- name: Disable systemd resolv and manually set DNS
+  hosts: all
+  become: yes
+  tasks:
+    - name: Remove immutable attribute from resolv.conf if exists
+      command: chattr -i /etc/resolv.conf
+      ignore_errors: yes
+      become: true
+
+    - name: Disable systemd-resolved
+      systemd:
+        name: systemd-resolved
+        state: stopped
+        enabled: false
+        daemon_reload: yes
+      become: true
+
+    - name: Remove resolv.conf symlink
+      file:
+        path: /etc/resolv.conf
+        state: absent
+      become: true
+    
+    - name: Create custom resolv.conf
+      template:
+        src: resolv.conf.j2
+        dest: /etc/resolv.conf
+        mode: '0644'
+      become: true
+    
+    - name: Make resolv.conf immutable
+      command: chattr +i /etc/resolv.conf
+      become: true

@@ -1,0 +1,11 @@
+---
+- name: reboot servers
+  hosts: all
+  become: true
+  tasks:
+    - name: Reboot servers
+      command: reboot
+      async: 0
+      poll: 0
+      ignore_errors: yes
+      become: true

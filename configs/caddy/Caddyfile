@@ -1,0 +1,118 @@
+{
+	debug
+	email homelab@rtyner.com
+	acme_dns cloudflare {
+		api_token {env.CF_API_TOKEN}
+	}
+}
+
+pve1.rtyner.com {
+	reverse_proxy http://10.1.1.2:8006
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+}
+
+pve2.rtyner.com {
+	reverse_proxy http://10.1.1.4:8006
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+}
+
+pve3.rtyner.com {
+	reverse_proxy http://10.1.1.5:8006
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+}
+
+gitlab.rtyner.com {
+	reverse_proxy 10.1.1.27:80 {
+		header_up Host {host}
+	}
+}
+
+vault.rtyner.com {
+	reverse_proxy http://10.1.1.16:8200
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+}
+
+port.rtyner.com {
+	reverse_proxy http://10.1.1.16:9000
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+}
+
+ipam.rtyner.com {
+	reverse_proxy http://10.1.1.16:8013
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+}
+
+npm.rtyner.com {
+	reverse_proxy http://10.1.1.16:81
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+}
+
+home.rtyner.com {
+	reverse_proxy http://10.1.1.16:3091
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+}
+
+grafana.rtyner.com {
+	reverse_proxy http://10.1.1.22:3000
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+}
+
+prom.rtyner.com {
+	reverse_proxy http://10.1.1.22:9090
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+}
+
+s3.rtyner.com {
+	reverse_proxy http://10.1.1.17:9099
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+}
+
+nas.rtyner.com {
+	reverse_proxy http://10.1.1.6:80
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+}
+
+noco.rtyner.com {
+	reverse_proxy http://10.1.1.25:80
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+}
+
+fw.rtyner.com {
+	reverse_proxy http://10.1.1.1:80
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+}
+
+paper.rtyner.com {
+	reverse_proxy http://10.1.1.17:8000
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+}

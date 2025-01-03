@@ -1,0 +1,155 @@
+- hosts: caddy
+  become: true
+  roles:
+    - artis3n.tailscale
+  
+  vars:
+    - tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
+
+  tasks:
+
+    - name: create local user and set pw
+      user:
+        name: "{{ local_user }}"
+        password: "{{ local_pw | password_hash('sha512') }}"
+        groups:
+         - sudo
+        state: present
+        shell: /bin/bash
+        system: no
+        createhome: yes
+        home: /home/rt    
+
+    - name: set authorized keys from file
+      ansible.posix.authorized_key:
+        user: rt
+        state: present
+        key: "{{ lookup('file', '/home/rt/.ssh/id_ed25519.pub') }}"
+
+    - name: nopasswd sudo
+      lineinfile:
+          path: /etc/sudoers
+          state: present
+          backup: yes
+          regexp: '^%sudo'
+          line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+          validate: 'visudo -cf %s'
+  
+    - name: disable root login
+      lineinfile:
+          path: /etc/ssh/sshd_config
+          state: present
+          backup: yes        
+          regexp: '^PermitRootLogin'
+          line: "PermitRootLogin no"
+  
+    - name: update apt 
+      apt:
+        update_cache: yes
+        name: '*'
+        force_apt_get: yes
+        state: latest
+  
+    - name: update packages
+      apt:
+        update_cache: yes
+        name: '*'
+        force_apt_get: yes
+        state: latest
+      when: ansible_facts['os_family'] == 'Debian'
+  
+    - name: install packages
+      package:
+        name: "{{packages}}"
+        state: present
+      vars:
+        packages:
+          - vim
+          - curl
+          - wget
+          - htop 
+          - gpg
+          - git 
+          - unzip
+          - rsync
+          - dnsutils
+          - nfs-common
+          - cifs-utils
+          - python3
+          - python3-pip
+          - build-essential
+          - python3-setuptools
+  
+    - name: download bashrc
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/rtyner/homelab/main/dotfiles/.bashrc
+        dest: /home/rt/.bashrc
+ 
+    - name: create working dir
+      ansible.builtin.file:
+        path: /home/rt/working
+        state: directory
+        owner: rt 
+        group: rt
+        mode: '0755'
+
+    - name: create mnt
+      ansible.builtin.file:
+        path: /home/rt/mnt
+        state: directory
+        owner: rt 
+        group: rt
+        mode: '0755'
+ 
+    - name: create mnt/red
+      ansible.builtin.file:
+       path: /home/rt/mnt/red
+       state: directory
+       owner: rt 
+       group: rt
+       mode: '0755'
+
+    - name: create mnt/bdp
+      ansible.builtin.file:
+        path: /home/rt/mnt/bdp
+        state: directory
+        owner: rt 
+        group: rt
+        mode: '0755'
+
+    - name: cifs utils
+      ansible.builtin.package:
+        name: cifs-utils
+        state: present
+    
+    - name: check red mount exists
+      ansible.builtin.file:
+        path: "{{ red_uri }}"
+        state: directory
+        mode: '0755'
+        owner: rt
+        group: rt
+ 
+    - name: mount red
+      ansible.posix.mount:
+        src: "{{ red_uri }}"
+        path: "{{ red_mountpoint }}"
+        fstype: cifs
+        opts: 'username={{ mount_username }},password={{ mount_password }},user,nofail'
+        state: mounted
+
+    - name: mount bdp
+      ansible.posix.mount:
+        src: "{{ bdp_uri }}"
+        path: "{{ bdp_mountpoint }}"
+        fstype: cifs
+        opts: 'username={{ mount_username }},password={{ mount_password }},user,nofail'
+        state: mounted
+
+    - name: mount arch
+      ansible.posix.mount:
+        src: "{{ arch_uri }}"
+        path: "{{ arch_mountpoint }}"
+        fstype: nfs
+        opts: 'user,nofail'
+        state: mounted

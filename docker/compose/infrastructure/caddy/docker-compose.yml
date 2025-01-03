@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  caddy:
+    build: .
+    container_name: caddy-cloudflare
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config:/config
+      - ./data:/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - CF_API_TOKEN=${CF_API_TOKEN}
+    restart: unless-stopped
+    networks:
+      - reverse_proxy
+
+networks:
+  reverse_proxy:    # Changed from proxy to reverse_proxy
+    driver: bridge

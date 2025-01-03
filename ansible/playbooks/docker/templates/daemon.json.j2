@@ -1,0 +1,39 @@
+{
+    "storage-driver": "overlay2",
+    "log-driver": "json-file",
+    "log-opts": {
+      "max-size": "10m",
+      "max-file": "3"
+    },
+    "default-ulimits": {
+      "nofile": {
+        "Name": "nofile",
+        "Hard": 64000,
+        "Soft": 64000
+      }
+    },
+    "metrics-addr": "0.0.0.0:9323",
+    "experimental": true,
+    "features": {
+      "buildkit": true
+    },
+    "live-restore": true,
+    "iptables": true,
+    "default-address-pools": [
+      {
+        "base": "172.17.0.0/16",
+        "size": 24
+      }
+    ],
+    "dns": ["10.1.1.96", "10.1.1.97"],
+    "dns-search": ["local.rtyner.com"],
+    "registry-mirrors": [],
+    "insecure-registries": [],
+    "debug": false,
+    "log-level": "info",
+    "tls": true,
+    "tlsverify": true,
+    "tlscacert": "/etc/docker/ca.pem",
+    "tlscert": "/etc/docker/server-cert.pem",
+    "tlskey": "/etc/docker/server-key.pem"
+  }
