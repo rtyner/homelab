@@ -1,93 +1,252 @@
-# homelab
+# Infrastructure Architecture
 
+## Overview
 
+This document outlines the architecture of my homelab infrastructure, including network topology, server configurations, and service deployments.
 
-## Getting started
+## Physical Infrastructure
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+### Hypervisors
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+I'm using Proxmox VE 8.x as the hypervisor platform across three nodes:
 
-## Add your files
+| Hostname    | Resources           | Primary Role              |
+| ----------- | ------------------- | ------------------------- |
+| prod-pve-01 | 192GB RAM, 24 cores | VM host                   |
+| prod-pve-02 | 64GB RAM, 16 cores  | VM Host, GPU workloads    |
+| prod-pve-03 | 16GB RAM, 4 cores   | VM Host, backup workloads |
+| prod-pve-04 | 384GB RAM, 32 cores | VM Host                   |
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+### Storage
 
-```
-cd existing_repo
-git remote add origin http://prod-gitlab-01/rt/homelab.git
-git branch -M main
-git push -uf origin main
-```
+| Hostname         | prod-pve-01 | prod-pve-02 | prod-pve-03   | prod-pve-04 | prod-nas-01 | prod-nas-02 |
+| ---------------- | ----------- | ----------- | ------------- | ----------- | ----------- | ----------- |
+| Physical Disks 1 | 2x 1TB SSD  | 2x 2TB NVMe | 1x 512GB NVMe | 9x 1TB SSD  | 2x 10TB HDD | 2x 14TB HDD |
+| Physical Disks 2 | 5x 5TB HDD  | 6x 8TB HDD  | N/A           | 7x 2TB SSHD | 4x 8TB HDD  | 2x 8TB HDD  |
+| Pools            |             |             |               |             |             |             |
+| Shares           |             |             |               |             |             | bdp, red    |
 
-## Integrate with your tools
+### Networking
 
-- [ ] [Set up project integrations](http://prod-gitlab-01/rt/homelab/-/settings/integrations)
+- Subnet: 10.1.1.0/24
+- Primary Network Equipment:
+  - Protectli FWB4
+  - Cisco WS-C3560G-24PS POE 24x 1Gbe
+  - Cisco Nexux 3060-X 48x 10Gbe Switch, 4x 40Gbe
+  - Brocade ICX7250-48P 48x 1Gbe, 8x 10Gbe
 
-## Collaborate with your team
+## Logical Infrastructure
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+### DNS Architecture
 
-## Test and Deploy
+I run a redundant DNS setup using BIND9:
 
-Use the built-in continuous integration in GitLab.
+- Primary DNS (prod-dns-01): 10.1.1.96
+- Secondary DNS (prod-dns-02): 10.1.1.97
+- Zones:
+  - local.rtyner.com
+  - rtyner.com
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+### Database Layer
 
-***
+PostgreSQL cluster deployed across multiple nodes for redundancy:
 
-# Editing this README
+- prod-pg-01 (10.1.1.15) - prod-pve-01
+- prod-pg-02 (10.1.1.18) - prod-pve-02
+- prod-pg-03 (10.1.1.23) - prod-pve-04
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+### Container Infrastructure
 
-## Suggestions for a good README
+Docker hosts for running containerized services:
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+- prod-docker-01 (10.1.1.16): Primary container host
+- prod-docker-02 (10.1.1.17): Secondary container host
 
-## Name
-Choose a self-explaining name for your project.
+### Kubernetes Cluster
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+K3s cluster configuration:
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+Masters:
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+- prod-k3s-cls01-master-01 (10.1.1.50)
+- prod-k3s-cls01-master-02 (10.1.1.51)
+- prod-k3s-cls01-master-03 (10.1.1.52)
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+Workers:
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+- prod-k3s-cls01-worker-01 (10.1.1.53)
+- prod-k3s-cls01-worker-02 (10.1.1.54)
+- prod-k3s-cls01-worker-03 (10.1.1.55)
+- prod-k3s-cls01-worker-04 (10.1.1.56)
+- prod-k3s-cls01-worker-05 (10.1.1.57)
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+## Service Architecture
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+### Core Services
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+1. DNS (BIND9)
+   - Primary and secondary DNS servers
+   - Internal zone management
+   - Split-horizon DNS configuration
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+2. Storage Services
+   - NFS shares for VM storage over 10Gbe
+   - SMB shares for media and backups
+   - Central file server (prod-file-01)
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+3. Monitoring Stack
+   - Prometheus for metrics collection
+   - Grafana for visualization
+   - Node Exporter on all hosts
+   - Container monitoring via cAdvisor
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+### Application Services
 
-## License
-For open source projects, say how it is licensed.
+1. Development Tools
+   - GitLab
+   - Jenkins
+   - Docker Registry
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+2. Network Services
+   - Cloudflare Tunnel
+   - Caddy Reverse Proxy
+
+## Backup Architecture
+
+- Proxmox Backup Server (prod-backup-01)
+- Daily VM backups
+- Weekly configuration backups
+- Monthly full system backups
+- Backups are stored locally and replicated to Backblaze B2
+
+## Network Security
+
+1. Network Segmentation
+   - Management VLAN
+   - Storage VLAN
+   - Data VLAN
+
+2. Access Control
+   - Internal DNS resolution
+   - Restricted management access
+   - VPN access for remote management
+
+## Automation and IaC
+
+1. Infrastructure Provisioning
+   - Terraform for VM provisioning
+   - Ansible for configuration management
+   - GitLab CI/CD for automation
+
+2. Configuration Management
+   - Version controlled configurations
+   - Automated deployments
+   - Configuration drift detection
+
+## Monitoring and Alerting
+1. Metrics Collection
+   - System metrics via Node Exporter
+   - Container metrics via cAdvisor
+   - Custom application metrics
+
+2. Visualization
+   - Grafana dashboards
+   - Performance metrics
+   - Capacity planning
+
+3. Alerting
+   - Prometheus Alertmanager
+   - Email notifications
+   - Critical system alerts
+
+## Hardware
+
+### Servers
+
+| Description   | Model                    | CPU               | RAM   | Storage                 | NIC               | OS               |
+| ------------- | ------------------------ | ----------------- | ----- | ----------------------- | ----------------- | ---------------- |
+| VM Host 1     | Dell R720                | 2x Xeon E5-2640   | 192GB | 2x1TB SSD ,5x5TB HDD    | 4X 1Gbe 1x 10Gbe  | Proxmox 8.x      |
+| VM Host 2     | Whitebox Server          | 1x AMD 5700X3D    | 64GB  | 1x 2TB NVMe 1x 1TB SSD  | 1x 1Gbe           | Proxmox 8.x      |
+| VM Host 3     | Lenovo ThinkCentre M92p  | 1x Intel i5-3470T | 16GB  | 1x 512GB NVMe           | 1x 1Gbe           | Proxmox 8.x      |
+| VM Host 4     | Dell R720                | 2x Xeon E5-2670   | 384GB | 9x 1TB SSD, 7x 2TB SSHD | 8x 1Gbe, 4x 10Gbe | Proxmox 8.x      |
+| NAS           | HP Proliant ML310E       | 1x Xeon E3-1230   | 32GB  | 2x 8TB 2x 14TB          | 1x 1Gbe 1x 10Gbe  | Truenas Core 13  |
+| NAS           | Dell R710                | 2x Xeon E3-1230   | 128GB | 2x 8TB 2x 14TB          | 4x 1Gbe 2x 10Gbe  | Truenas Scale 24 |
+| Temp Sensor   | ESP8266 + DHT22          |                   |       |                         |                   |                  |
+
+### Network 
+
+| Description        | Model                | Ports               | Description           | Functions         |
+| ------------------ | -------------------- | ------------------- | --------------------- | ----------------- |
+| Primary Firewall   | Protectli FW4B       | 4x 1Gbe             | Primary Firewall      | Routing, firewall |
+| Secondary Firewall | OPNSense VM          | 4x 1Gbe             | Secondary Firewall    |                   |
+| Core Switch        | Cisco Nexux 3060-X   | 48x 10Gbe, 4x 40Gbe | Core Server Switch    |                   |
+| Access Switch      | Brocade ICX7250-48P  | 48x 1Gbe, 8x 10Gbe  | Primary Access Switch |                   |
+| Access Switch      | Cisco WS-C3560G-24PS | 24x 1Gbe            |                       | PoE               |
+
+## Physical Infrastructure
+
+| hostname                    | ip                  | function                          |
+| --------------------------- | ------------------- | --------------------------------- |
+| prod-fw-01                  | 10.1.1.1            | primary firewall                  |
+| prod-pve-01                 | 10.1.1.2,10.12.1.1  | proxmox hypervisor                |
+| prod-pve-02                 | 10.1.1.4            | proxmox hypervisor                |
+| prod-pve-03                 | 10.1.1.5            | proxmox hypervisor                |
+| prod-pve-04                 | 10.1.1.7            | proxmox hypervisor                |
+| prod-nas-01                 | 10.1.1.8, 10.12.1.2 | truenas storage server smb, nfs   |
+| prod-nas-02                 | 10.1.1.6, 10.12.1.4 | truenas backup server smb, nfs    |
+| EAP660 HD-6C-5A-B0-A2-7C-78 | 10.1.1.253          | TP Link Omada AP                  |
+| acc-sw-01                   | 10.1.1.254          | Cisco 24p switch                  |
+| acc-sw-02                   | 10.1.1.251          | Brocade 48x 1Gbe, 8x 10Gbe switch |
+| core-sw-01                  | 10.1.1.252          | Cisco 48x 1Gbe, 4x 40Gbe switch   |
+| rack01-temp-01              | 10.1.1.30           | Rack temperature monitoring       |
+
+## VMs
+
+| hostname                 | ip                    | host        | function                                            |
+| ------------------------ | --------------------- | ----------- | --------------------------------------------------- |
+| prod-backup-01           | 10.1.1.14             | prod-pve-03 | proxmox backup server                               |
+| prod-pg-01               | 10.1.1.15             | pve-01      | postgres server                                     |
+| prod-docker-01           | 10.1.1.16             | pve-01      | docker server 01                                    |
+| prod-docker-02           | 10.1.1.17, 10.12.1.10 | pve-01      | docker server 02                                    |
+| prod-pg-02               | 10.1.1.18             | pve-02      | postgres server                                     |
+| dev-ollama-01            | 10.1.1.19             | pve-02      | ollama                                              |
+| dev-arch-01              | 10.1.1.20             | pve-02      | linux jump/dev box                                  |
+| prod-file-01             | 10.1.1.21             | pve-01      | nfs file server                                     |
+| prod-monitor-01          | 10.1.1.22             | pve-02      | monitoring server, prometheus, grafana, uptime kuma |
+| prod-pg-03               | 10.1.1.23             | pve-01      | postgres server                                     |
+| prod-jenkins-01          | 10.1.1.24             | pve-01      | jenkins server                                      |
+| prod-nocodb-01           | 10.1.1.25             | pve-02      | nocodb                                              |
+| prod-caddy-01            | 10.1.1.26             | pve-02      | caddy reverse proxy                                 |
+| prod-gitlab-01           | 10.1.1.27             | pve-02      | gitlab                                              |
+| prod-gitea-01            | 10.1.1.29             | pve-04      | gitea                                               |
+| docker-master-01         | 10.1.1.30             | pve-04      | master node docker                                  |
+| prod-k3s-cls01-master-01 | 10.1.1.50             | pve-01      | k3s master                                          |
+| prod-k3s-cls01-master-02 | 10.1.1.51             | pve-02      | k3s master                                          |
+| prod-k3s-cls01-master-03 | 10.1.1.52             | pve-03      | k3s master                                          |
+| prod-k3s-cls01-worker-01 | 10.1.1.53             | prod-pve-01 | k3s worker                                          |
+| prod-k3s-cls01-worker-02 | 10.1.1.54             | prod-pve-01 | k3s worker                                          |
+| prod-k3s-cls01-worker-03 | 10.1.1.55             | prod-pve-02 | k3s worker                                          |
+| prod-k3s-cls01-worker-04 | 10.1.1.56             | prod-pve-03 | k3s worker                                          |
+| prod-k3s-cls01-worker-05 | 10.1.1.57             | prod-pve-03 | k3s worker                                          |
+| prod-bind-01             | 10.1.1.96             | prod-pve-01 | bind master                                         |
+| prod-bind-02             | 10.1.1.97             | prod-pve-03 | bind slave                                          |
+| prod-dns-01              | 10.1.1.98             | pve-01      | primary pihole                                      |
+| prod-dns-02              | 10.1.1.99             | pve-02      | secondary pihole                                    |
+
+## Docker Containers
+
+| container name            | hostname                   | host            | function             | ports          |
+| ------------------------- | -------------------------- | --------------- | -------------------- | -------------- |
+| plex                      | plex.local.rtyner.com      | prod-docker-02  | primary plex server  |                |
+| homepage                  | dash.local.rtyner.com      | prod-docker-01  | homepage dashboard   | 3091           |
+| phpipam-phpipam-web-1     | ipam.local.rtyner.com      | prod-docker-01  | phpipam web          | 8013           |
+| phpipam-phpipam-cron-1    |                            | prod-docker-01  | phpipam cron         | 80             |
+| phpipam-phpipam-mariadb-1 |                            | prod-docker-01  | phpipam db           | 3306           |
+| nginx-proxy-manager       |                            | prod-docker-01  | nginx proxy manager  | 80, 443        |
+| watchtower-watchtower-1   |                            | prod-docker-01  | container updates    | 8080           |
+| minio-minio-1             |                            | prod-docker-02  | minio s3 storage     | 9098,9099      |
+| cloudflare-tunnel         | cloudflared                | prod-docker-02  | cloudflare tunnel    | 8081           |
+| dashy                     | dash.local.rtyner.com      | prod-docker-01  | dashboard            | 4000           |
+| portainer                 | portainer.local.rtyner.com | prod-docker-01  | container management | 8000,9000,9443 |
+| monitoring-grafana-1      | grafana.local.rtyner.com   | prod-monitor-02 | grafana              | 3000           |
+| monitoring-prometheus-1   | prom.local.rtyner.com      | prod-monitor-02 | prometheus           | 9090           |
