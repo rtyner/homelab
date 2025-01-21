@@ -1,0 +1,24 @@
+services:
+    semaphore:
+        ports:
+            - 9045:3000
+        image: semaphoreui/semaphore:v2.11.2
+        environment:
+            SEMAPHORE_DB_DIALECT: postgres
+            SEMAPHORE_DB_HOST: 10.1.1.15
+            SEMAPHORE_DB_NAME: semaphore
+            SEMAPHORE_DB_USER: semaphore
+            SEMAPHORE_DB_PASS: ${SEMAPHORE_DB_PASS}
+            SEMAPHORE_ADMIN: rt
+            SEMAPHORE_ADMIN_PASSWORD: ${SEMAPHORE_ADMIN_PASSWORD}
+            SEMAPHORE_ADMIN_NAME: rt
+            SEMAPHORE_ADMIN_EMAIL: homelab@rtyner.com
+            ANSIBLE_HOST_KEY_CHECKING: False
+        volumes:
+            - semaphore_data:/var/lib/semaphore
+            - semaphore_config:/etc/semaphore
+            - semaphore_tmp:/tmp/semaphore
+volumes:
+    semaphore_data:
+    semaphore_config:
+    semaphore_tmp:

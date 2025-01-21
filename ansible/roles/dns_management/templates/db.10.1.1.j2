@@ -1,0 +1,19 @@
+;
+; BIND reverse data file for 10.1.1.0/24 network
+;
+$TTL    604800
+@       IN      SOA     prod-bind-01.local.rtyner.com. dns@rtyner.com. (
+                        {{ ansible_date_time.epoch }}  ; Serial
+                        12h         ; Refresh
+                        15m         ; Retry
+                        3w          ; Expire
+                        2h )        ; Negative Cache TTL
+
+; Name servers
+@       IN      NS      prod-bind-01.local.rtyner.com.
+@       IN      NS      prod-bind-02.local.rtyner.com.
+
+; PTR records
+{% for record in dns_records %}
+{{ record.ip.split('.')[-1] }}      IN      PTR     {{ record.hostname }}.local.rtyner.com.
+{% endfor %}

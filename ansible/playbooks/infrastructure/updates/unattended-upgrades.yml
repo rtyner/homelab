@@ -1,0 +1,33 @@
+---
+- name: Enable unattended-upgrades
+  hosts: all
+  become: true
+  tasks:
+    - name: Install unattended-upgrades package
+      apt:
+        name: unattended-upgrades
+        state: present
+
+    - name: Enable automatic updates
+      debconf:
+        name: unattended-upgrades
+        question: unattended-upgrades/enable_auto_updates
+        vtype: boolean
+        value: 'true'
+
+    - name: Configure unattended-upgrades
+      lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: '^//Unattended-Upgrade::Allowed-Origins', line: 'Unattended-Upgrade::Allowed-Origins { "${distro_id}:${distro_codename}"; "${distro_id}:${distro_codename}-security"; };' }
+        - { regexp: '^//Unattended-Upgrade::Mail "root"', line: 'Unattended-Upgrade::Mail "root@localhost";' }
+        - { regexp: '^//Unattended-Upgrade::Automatic-Reboot "false";', line: 'Unattended-Upgrade::Automatic-Reboot "true";' }
+        - { regexp: '^//Unattended-Upgrade::Remove-Unused-Dependencies "false";', line: 'Unattended-Upgrade::Remove-Unused-Dependencies "true";' }
+
+    - name: Ensure unattended-upgrades service is running
+      service:
+        name: unattended-upgrades
+        state: started
+        enabled: yes

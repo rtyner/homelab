@@ -1,0 +1,52 @@
+# Global options block
+. {
+    # enable logging
+    log
+    errors
+    cache
+
+    # define acls
+    acl {
+        allow net 10.1.1.0/24
+        allow net 10.10.1.0/24
+        allow net 10.20.1.0/24
+        allow net 10.30.1.0/24
+        allow net 10.40.1.0/24
+        allow net 10.50.1.0/24
+        allow net 10.60.1.0/24
+        allow net 10.70.1.0/24
+        allow net 10.80.1.0/24
+        allow net 10.90.1.0/24
+        allow net 10.99.1.0/24
+    }
+
+    # configure forwarding to cloudflare and google
+    forward . 1.1.1.1 8.8.8.8
+
+    # enable primary -> secondary transger
+    transfer {
+        to 10.1.1.97
+    }
+}
+
+
+# local zone configuration
+local.rtyner.com {
+    file db.local.rtyner.com
+    log
+
+    # enable zone transfers
+    transfer {
+        to 10.1.1.97
+    }
+    
+    # enable dynamic updates with tsig for terraform
+    tsig {
+        secret local.rtyner.com.key. 
+    }
+}
+
+# secondary nameserver configuration
+#dns-prod-02.local.rtyner.com {
+#    bind 10.1.1.97
+#}

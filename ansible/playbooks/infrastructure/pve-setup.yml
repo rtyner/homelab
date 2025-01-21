@@ -1,0 +1,84 @@
+---
+- hosts: pve
+  become: true
+  tasks:
+    - name: standard packages
+      apt:
+        pkg: 
+        - vim
+        - git
+        - gpg
+        - htop
+        - curl
+        - sudo
+        - unzip
+        - rsync
+        - rclone
+        - dnsutils
+        - nfs-common
+        - python3-pip
+        - build-essential
+        - python3-setuptools
+        - prometheus-node-exporter
+        update_cache: yes
+
+    - name: Create a new regular user with sudo privileges
+      user:
+        name: rt
+        state: present
+        groups: 
+          - sudo
+          - www-data
+          - disk
+          - kvm
+        append: true
+        create_home: true
+        shell: /bin/bash  # Set shell to bash
+
+    - name: Create SSH directory for rt
+      file:
+        path: /home/rt/.ssh
+        state: directory
+        owner: rt
+        group: rt
+        mode: '0700'
+
+    - name: Add local SSH key
+      ansible.posix.authorized_key:
+        user: rt
+        state: present
+        key: "{{ lookup('file', '/Users/rt/.ssh/id_ed25519.pub') }}"
+
+    - name: nopasswd sudo
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        backup: yes
+        regexp: '^%sudo'
+        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+        
+    - name: disable root login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        backup: yes        
+        regexp: '^PermitRootLogin'
+        line: "PermitRootLogin yes"
+
+    - name: restart ssh
+      service:
+        name: ssh
+        state: restarted
+
+    - name: bashrc
+      get_url: 
+        url: https://raw.githubusercontent.com/rtyner/homelab/refs/heads/main/dotfiles/.bashrc
+        dest: /home/rt/
+
+    - name: Set correct ownership for bashrc
+      file:
+        path: /home/rt/.bashrc
+        owner: rt
+        group: rt
+        mode: '0644'

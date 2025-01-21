@@ -1,0 +1,12 @@
+version: '3'
+services:
+  pinchflat:
+    image: ghcr.io/kieraneglin/pinchflat:latest
+    environment:
+      # Set the timezone to your local timezone
+      - TZ=America/New_York
+    ports:
+      - '8945:8945'
+    volumes:
+      - ./config:/config
+      - /home/rt/mount/shares/media/youtube:/downloads

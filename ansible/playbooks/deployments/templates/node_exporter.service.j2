@@ -1,0 +1,37 @@
+[Unit]
+Description=Prometheus Node Exporter
+Documentation=https://github.com/prometheus/node_exporter
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=node_exporter
+Group=node_exporter
+ExecStart=/usr/local/bin/node_exporter \
+    --collector.filesystem.mount-points-exclude="^/(sys|proc|dev|host|etc)($$|/)" \
+    --collector.filesystem.fs-types-exclude="^(sysfs|procfs|autofs|nfs|nfs4|tmpfs|binfmt_misc|9p|cgroup|hugetlbfs|mqueue|bpf)$$" \
+    --web.listen-address=:9100 \
+    --web.telemetry-path=/metrics \
+    --collector.systemd \
+    --collector.processes \
+    --collector.cpu \
+    --collector.meminfo
+
+# Security settings
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ReadWritePaths=/proc/sys/net
+
+# Restart settings
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

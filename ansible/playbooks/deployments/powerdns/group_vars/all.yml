@@ -1,0 +1,67 @@
+# PostgreSQL configuration
+pdns_db_name: powerdns
+pdns_db_user: pdns
+pdns_db_password: "{{ vault_pdns_db_password }}"  # Store this in ansible-vault
+
+# PowerDNS API configuration
+pdns_api_key: "{{ vault_pdns_api_key }}"  # Store this in ansible-vault
+
+# Network configuration
+pdns_local_address: "0.0.0.0"
+pdns_local_port: 5300
+pdns_recursor_port: 53
+
+# Logging configuration
+pdns_loglevel: 4
+
+# Templates directory
+# templates/pdns.conf.j2
+launch=gpgsql
+gpgsql-host=localhost
+gpgsql-user={{ pdns_db_user }}
+gpgsql-password={{ pdns_db_password }}
+gpgsql-dbname={{ pdns_db_name }}
+
+api=yes
+api-key={{ pdns_api_key }}
+webserver=yes
+webserver-port=8081
+webserver-address=0.0.0.0
+webserver-allow-from=10.0.0.0/8
+
+local-port={{ pdns_local_port }}
+local-address={{ pdns_local_address }}
+
+daemon=yes
+guardian=yes
+setgid=pdns
+setuid=pdns
+
+logging-facility=0
+loglevel={{ pdns_loglevel }}
+
+# Prometheus metrics
+webserver-statistics=yes
+statistics-api-key={{ pdns_api_key }}
+
+# templates/pdns-recursor.conf.j2
+allow-from=10.0.0.0/8
+local-port={{ pdns_recursor_port }}
+local-address={{ pdns_local_address }}
+
+forward-zones=rtyner.com=YOUR_LOCAL_DNS_IP
+forward-zones+=local.rtyner.com=YOUR_LOCAL_DNS_IP
+
+daemon=yes
+setgid=pdns-recursor
+setuid=pdns-recursor
+
+logging-facility=0
+loglevel={{ pdns_loglevel }}
+
+# Prometheus metrics
+webserver=yes
+webserver-port=8082
+webserver-address=0.0.0.0
+webserver-allow-from=10.0.0.0/8
+api-key={{ pdns_api_key }}

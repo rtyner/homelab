@@ -1,0 +1,42 @@
+# pdns.conf.j2
+# Basic Settings
+setuid=pdns
+setgid=pdns
+daemon=no
+
+# Launch specific backend
+launch=gmysql
+gmysql-host=127.0.0.1
+gmysql-port=3306
+gmysql-user=pdns
+gmysql-password={{ pdns_db_password }}
+gmysql-dbname=powerdns
+
+# Primary/Secondary configuration
+{% if inventory_hostname == primary_dns %}
+primary=yes
+{% else %}
+secondary=yes
+{% endif %}
+
+# Network Settings
+local-address=0.0.0.0
+local-port=53
+
+# Zone Transfer Settings
+{% if inventory_hostname == primary_dns %}
+# Primary specific settings
+allow-axfr-ips={{ secondary_dns }}
+also-notify={{ secondary_dns }}
+{% else %}
+# Secondary specific settings
+allow-notify-from={{ primary_dns }}
+{% endif %}
+
+# Cache Settings
+query-cache-ttl=20
+negquery-cache-ttl=60
+
+# Default SOA Settings
+default-soa-name=ns1.local.rtyner.com
+default-soa-mail=dns.local.rtyner.com

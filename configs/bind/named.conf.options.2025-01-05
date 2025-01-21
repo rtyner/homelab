@@ -1,0 +1,78 @@
+include "/etc/bind/tsig.key";
+
+acl "trusted" {
+        10.1.1.0/24;
+        10.1.1.96;      #ns1
+        10.1.1.97;      #ns2
+        10.1.1.0/24;
+        10.10.1.0/24;
+        10.20.1.0/24;
+        10.30.1.0/24;
+        10.40.1.0/24;
+        10.50.1.0/24;
+        10.60.1.0/24;
+        10.70.1.0/24;
+        10.80.1.0/24;
+        10.90.1.0/24;
+        10.99.1.0/24;
+
+};
+
+logging {
+    channel general_dns {
+        file "/var/log/named/general.log" versions 3 size 5m;
+        severity dynamic;
+        print-time yes;
+        print-severity yes;
+    };
+    channel dnssec_log {
+        file "/var/log/named/dnssec.log" versions 3 size 5m;
+        severity debug;
+        print-time yes;
+        print-severity yes;
+    };
+    channel query_log {
+        file "/var/log/named/query.log" versions 3 size 5m;
+        severity dynamic;
+        print-time yes;
+    };
+    channel security_info {
+        file "/var/log/named/security.log" versions 3 size 5m;
+        severity info;
+        print-time yes;
+        print-severity yes;
+    };
+    channel update_debug {
+        file "/var/log/named/update_debug.log" versions 3 size 5m;
+        severity debug;
+        print-time yes;
+        print-severity yes;
+    };
+
+    category default { general_dns; };
+    category queries { query_log; };
+    category dnssec  { dnssec_log; };
+    category security { security_info; };
+    category update { update_debug; };
+    category update-security { security_info; };
+};
+
+options {
+        directory "/var/cache/bind";
+
+        recursion yes;
+        allow-recursion { trusted; };
+        allow-query { trusted; };
+        listen-on { 10.1.1.96; };
+        zone-statistics yes;
+        allow-transfer { 10.1.1.97; };
+        dnssec-validation no;
+        listen-on-v6 { none; };
+
+        forward only;
+        forwarders {
+                1.1.1.1;
+                8.8.8.8;
+};
+
+};

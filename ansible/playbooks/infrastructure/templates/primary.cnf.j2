@@ -1,0 +1,24 @@
+# primary.cnf.j2
+[mysqld]
+# Replication configuration
+server-id = 1
+log-bin = mysql-bin
+binlog_format = ROW
+sync_binlog = 1
+expire_logs_days = 10
+max_binlog_size = 100M
+
+# Basic settings
+bind-address = {{ ansible_host }}
+innodb_buffer_pool_size = 256M
+innodb_flush_log_at_trx_commit = 1
+
+# PowerDNS specific optimizations
+max_connections = 100
+thread_cache_size = 10
+query_cache_size = 32M
+query_cache_type = 1
+
+# Character set
+character-set-server = utf8mb4
+collation-server = utf8mb4_general_ci

@@ -1,0 +1,74 @@
+# deploy-gitea.yml
+---
+- name: Deploy Gitea Container
+  hosts: all
+  become: yes
+  
+  vars:
+    compose_dir: /opt/gitea
+    data_dir: /opt/gitea
+
+  tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+        update_cache: yes
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Create Gitea directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+        owner: 1000
+        group: 1000
+      loop:
+        - "{{ compose_dir }}"
+        - "{{ data_dir }}"
+
+    - name: Copy Docker Compose file
+      copy:
+        dest: "{{ compose_dir }}/docker-compose.yml"
+        content: |
+          version: "3"
+          
+          services:
+            gitea:
+              image: gitea/gitea:latest
+              container_name: gitea
+              environment:
+                - DB_TYPE=postgres
+                - DB_HOST=10.1.1.15:5432
+                - DB_NAME=giteadb
+                - DB_USER=gitea
+                - DB_PASSWD=spell*oozing@deserves-yer3exhaust0FISHER!soju1keepers1sable*perkins-shades5jurors5freeze0laila!housed
+                - USER_UID=1000
+                - USER_GID=1000
+              restart: always
+              volumes:
+                - {{ data_dir }}:/data
+                - /etc/timezone:/etc/timezone:ro
+                - /etc/localtime:/etc/localtime:ro
+              ports:
+                - "3000:3000"
+                - "222:22"
+
+    - name: Deploy Gitea container
+      community.docker.docker_compose_v2:
+        project_src: "{{ compose_dir }}"
+        state: present
+        pull: missing

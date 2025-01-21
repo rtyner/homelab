@@ -1,0 +1,59 @@
+---
+- name: Deploy Prometheus Container
+  hosts: 10.1.1.7
+  become: true
+  vars:
+    prometheus_storage_path: /var/lib/prometheus
+    prometheus_config_path: /etc/prometheus
+    prometheus_container_name: prometheus
+    prometheus_version: v2.49.1
+
+  tasks:
+    - name: Create Prometheus directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+        owner: 65534  # nobody user (used by Prometheus container)
+        group: 65534  # nobody group
+      loop:
+        - "{{ prometheus_storage_path }}"
+        - "{{ prometheus_config_path }}"
+        - "{{ prometheus_config_path }}/rules"
+
+    - name: Create Prometheus configuration
+      template:
+        src: prometheus.yml.j2
+        dest: "{{ prometheus_config_path }}/prometheus.yml"
+        mode: '0644'
+        owner: 65534
+        group: 65534
+      notify: restart prometheus
+
+    - name: Create Prometheus container
+      docker_container:
+        name: "{{ prometheus_container_name }}"
+        image: "prom/prometheus:{{ prometheus_version }}"
+        state: started
+        restart_policy: unless-stopped
+        ports:
+          - "9090:9090"
+        volumes:
+          - "{{ prometheus_storage_path }}:/prometheus"
+          - "{{ prometheus_config_path }}/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+          - "{{ prometheus_config_path }}/rules:/etc/prometheus/rules:ro"
+        command:
+          - "--config.file=/etc/prometheus/prometheus.yml"
+          - "--storage.tsdb.path=/prometheus"
+          - "--storage.tsdb.retention.time=15d"
+          - "--web.enable-lifecycle"
+        user: "65534:65534"
+        network_mode: bridge
+        container_default_behavior: compatibility
+
+  handlers:
+    - name: restart prometheus
+      docker_container:
+        name: "{{ prometheus_container_name }}"
+        state: started
+        restart: yes

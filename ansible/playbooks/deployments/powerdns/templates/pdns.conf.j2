@@ -1,0 +1,27 @@
+launch=gpgsql
+gpgsql-host=localhost
+gpgsql-user={{ pdns_db_user }}
+gpgsql-password={{ pdns_db_password }}
+gpgsql-dbname={{ pdns_db_name }}
+
+api=yes
+api-key={{ pdns_api_key }}
+webserver=yes
+webserver-port=8081
+webserver-address=0.0.0.0
+webserver-allow-from=10.0.0.0/8
+
+local-port={{ pdns_local_port }}
+local-address={{ pdns_local_address }}
+
+daemon=yes
+guardian=yes
+setgid=pdns
+setuid=pdns
+
+logging-facility=0
+loglevel={{ pdns_loglevel }}
+
+# Prometheus metrics
+webserver-statistics=yes
+statistics-api-key={{ pdns_api_key }}

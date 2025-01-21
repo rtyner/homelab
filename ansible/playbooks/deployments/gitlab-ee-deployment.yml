@@ -1,0 +1,175 @@
+---
+- name: Deploy GitLab Enterprise Edition
+  hosts: all
+  become: true
+  vars:
+    gitlab_domain: gitlab.local.rtyner.com
+    gitlab_external_url: "http://{{ gitlab_domain }}"
+    gitlab_backup_path: /var/opt/gitlab/backups
+    gitlab_edition: ee
+    gitlab_version: 17.6.2-ee.0
+    smtp_enabled: false
+    prometheus_monitoring_enabled: true
+    node_exporter_enabled: true
+    
+  handlers:
+    - name: restart gitlab
+      command: gitlab-ctl reconfigure
+    
+    - name: restart node_exporter
+      systemd:
+        name: node_exporter
+        state: restarted
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required dependencies
+      apt:
+        name:
+          - curl
+          - openssh-server
+          - ca-certificates
+          - tzdata
+          - perl
+          - postfix
+        state: present
+
+    - name: Add GitLab repository GPG key
+      apt_key:
+        url: https://packages.gitlab.com/gitlab/gitlab-ee/gpgkey
+        state: present
+
+    - name: Add GitLab repository
+      apt_repository:
+        repo: "deb https://packages.gitlab.com/gitlab/gitlab-ee/ubuntu/ noble main"
+        state: present
+        filename: gitlab_gitlab-ee
+        
+    - name: Add GitLab source repository
+      apt_repository:
+        repo: "deb-src https://packages.gitlab.com/gitlab/gitlab-ee/ubuntu/ noble main"
+        state: present
+        filename: gitlab_gitlab-ee_src
+
+    - name: Install GitLab Enterprise Edition
+      apt:
+        name: "gitlab-ee={{ gitlab_version }}"
+        state: present
+      notify: restart gitlab
+
+    - name: Create GitLab configuration file
+      template:
+        src: gitlab.rb.j2
+        dest: /etc/gitlab/gitlab.rb
+        owner: root
+        group: root
+        mode: '0600'
+      notify: restart gitlab
+
+    - name: Ensure backup directory exists
+      file:
+        path: "{{ gitlab_backup_path }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Update backup directory ownership after GitLab installation
+      file:
+        path: "{{ gitlab_backup_path }}"
+        state: directory
+        owner: git
+        group: git
+        mode: '0755'
+      when: ansible_facts.services['gitlab-runsvdir'] is defined
+
+    - name: Configure node exporter for Prometheus monitoring
+      block:
+        - name: Create node_exporter user
+          user:
+            name: node_exporter
+            system: yes
+            shell: /usr/sbin/nologin
+
+        - name: Create temporary directory for node exporter
+          file:
+            path: /tmp/node_exporter
+            state: directory
+            mode: '0755'
+
+        - name: Download and extract node exporter
+          unarchive:
+            src: https://github.com/prometheus/node_exporter/releases/download/v1.8.2/node_exporter-1.8.2.linux-arm64.tar.gz
+            dest: /tmp/node_exporter/
+            remote_src: yes
+            creates: /usr/local/bin/node_exporter
+
+        - name: Move node exporter binary
+          copy:
+            src: "/tmp/node_exporter/node_exporter-1.8.2.linux-amd64/node_exporter"
+            dest: /usr/local/bin/node_exporter
+            remote_src: yes
+            mode: '0755'
+            owner: node_exporter
+            group: node_exporter
+
+        - name: Clean up temporary files
+          file:
+            path: /tmp/node_exporter
+            state: absent
+
+        - name: Create node exporter service file
+          template:
+            src: node_exporter.service.j2
+            dest: /etc/systemd/system/node_exporter.service
+            mode: '0644'
+          notify: restart node_exporter
+
+        - name: Start and enable node_exporter
+          systemd:
+            name: node_exporter
+            state: started
+            enabled: yes
+            daemon_reload: yes
+      when: node_exporter_enabled
+
+    - name: Configure GitLab Prometheus monitoring
+      block:
+        - name: Enable Prometheus monitoring in GitLab configuration
+          lineinfile:
+            path: /etc/gitlab/gitlab.rb
+            line: "prometheus['enable'] = true"
+            insertafter: EOF
+          notify: restart gitlab
+
+        - name: Configure Prometheus listen address
+          lineinfile:
+            path: /etc/gitlab/gitlab.rb
+            line: "prometheus['listen_address'] = '0.0.0.0:9090'"
+            insertafter: EOF
+          notify: restart gitlab
+      when: prometheus_monitoring_enabled
+
+    - name: Wait for GitLab to be ready
+      uri:
+        url: "{{ gitlab_external_url }}/-/health"
+        method: GET
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 60
+      delay: 10
+      ignore_errors: true
+
+    - name: Display GitLab root password
+      command: cat /etc/gitlab/initial_root_password
+      register: root_password
+      changed_when: false
+
+    - name: Show GitLab root password
+      debug:
+        msg: "GitLab root password: {{ root_password.stdout_lines | select('match', '^Password:') | list | first }}"

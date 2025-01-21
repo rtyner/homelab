@@ -1,0 +1,97 @@
+---
+- name: Configure HAProxy with High Availability
+  hosts: haproxy_servers
+  become: true
+  vars:
+    virtual_ip: "10.1.1.33"
+    virtual_router_id: 51
+    keepalived_auth_pass: bX9a369922
+    haproxy_stats_password: bX9a369922  
+    #keepalived_auth_pass: "{{ vault_keepalived_auth_pass }}"
+    #haproxy_stats_password: "{{ vault_haproxy_stats_password }}"
+    primary_host: "prod-haproxy-01"
+
+  tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - haproxy
+          - keepalived
+          - ipvsadm
+        state: present
+        update_cache: yes
+
+    - name: Enable IP forwarding
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: 1
+        state: present
+        reload: yes
+
+    - name: Enable non-local bind for HAProxy
+      sysctl:
+        name: net.ipv4.ip_nonlocal_bind
+        value: 1
+        state: present
+        reload: yes
+
+    - name: Configure Keepalived
+      template:
+        src: keepalived.conf.j2
+        dest: /etc/keepalived/keepalived.conf
+        mode: '0644'
+      notify: restart keepalived
+
+    - name: Create Keepalived check script
+      copy:
+        dest: /usr/local/bin/check_haproxy.sh
+        mode: '0755'
+        content: |
+          #!/bin/bash
+          if pidof haproxy >/dev/null; then
+              exit 0
+          fi
+          exit 1
+
+    - name: Configure HAProxy
+      template:
+        src: haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+        mode: '0644'
+        validate: 'haproxy -c -f %s'
+      notify: restart haproxy
+
+    - name: Create Prometheus configuration directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - /etc/prometheus
+        - /etc/prometheus/conf.d
+
+    - name: Set up monitoring for both HAProxy instances
+      template:
+        src: prometheus_haproxy.yml.j2
+        dest: /etc/prometheus/conf.d/haproxy.yml
+        mode: '0644'
+
+    - name: Enable and start services
+      systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop:
+        - haproxy
+        - keepalived
+
+  handlers:
+    - name: restart keepalived
+      systemd:
+        name: keepalived
+        state: restarted
+
+    - name: restart haproxy
+      systemd:
+        name: haproxy
+        state: restarted

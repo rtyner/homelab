@@ -1,0 +1,63 @@
+---
+- Group A:
+    - Portainer:
+        icon: si-portainer
+        href: https://port.rtyner.com
+    - PVE 01:
+        icon: si-proxmox
+        href: https://pve1.rtyner.com
+        ping: 10.1.1.2     
+    - PBS:
+        icon: si-proxmox
+        href: https://pbs.rtyner.com      
+    - TrueNAS:
+        icon: si-truenas
+        href: https://nas.rtyner.com
+        ping: 10.1.1.6
+    - Grafana:
+        icon: si-grafana
+        href: https://grafana.rtyner.com
+    - Prometheus:
+        icon: si-prometheus
+        href: https://prom.rtyner.com 
+    - Loki:
+        icon: si-loki
+        href:           
+    - Protectli:
+        icon: si-opnsense
+        href: https://fw.rtyner.com
+
+- Group B:
+    - NocoDB:
+        icon: si-nocodb
+        href: http://10.1.1.25/dashboard
+        ping: 10.1.1.25
+    - Gitlab:
+        icon: si-gitlab
+        href: https://gitlab.rtyner.com   
+    - Vault:
+        icon: si-hashicorp-vault
+        href: https://vault.rtyner.com
+    - AnsibleTower:
+        icon: si-ansible
+        href:   
+    - UptimeKuma:
+        icon: si-uptime-kuma
+        href:        
+    - NPM:
+        icon: si-nginx-proxy-manager
+        href: https://npm.rtyner.com
+    - PHPIPAM:
+        icon: si-phpipam
+        href: https://ipam.rtyner.com         
+    - MinIO:
+        icon: si-minio
+        href: https://s3.rtyner.com        
+
+- Group C:
+    - Backblaze:
+        icon: si-backblaze
+        href: https://secure.backblaze.com/b2_buckets.htm
+    - Cloudflare:
+        icon: si-cloudflare
+        href: https://www.cloudflare.com

@@ -1,0 +1,40 @@
+vrrp_script check_haproxy {
+    script "/usr/local/bin/check_haproxy.sh"
+    interval 2
+    weight 2
+    fall 2
+    rise 2
+}
+
+vrrp_instance VI_1 {
+    interface {{ ansible_default_ipv4.interface }}
+    state {{ 'MASTER' if inventory_hostname == primary_host else 'BACKUP' }}
+    priority {{ '101' if inventory_hostname == primary_host else '100' }}
+    virtual_router_id {{ virtual_router_id }}
+    
+    authentication {
+        auth_type PASS
+        auth_pass {{ keepalived_auth_pass }}
+    }
+    
+    virtual_ipaddress {
+        {{ virtual_ip }}/24
+    }
+    
+    track_script {
+        check_haproxy
+    }
+    
+    notify /usr/local/bin/keepalived-notify.sh
+}
+
+global_defs {
+    notification_email {
+        homelab@rtyner.com
+    }
+    notification_email_from haproxy@local.rtyner.com
+    smtp_server 127.0.0.1
+    smtp_connect_timeout 30
+    router_id {{ inventory_hostname }}
+    enable_script_security
+}

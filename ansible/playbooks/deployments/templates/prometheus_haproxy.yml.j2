@@ -1,0 +1,16 @@
+- job_name: 'haproxy'
+  static_configs:
+    - targets:
+      - 'prod-haproxyproxy-01:8404'
+      - 'prod-haproxyproxy-02:8404'
+  metrics_path: /stats;csv
+  params:
+    format: [prometheus]
+  basic_auth:
+    username: admin
+    password: {{ haproxy_stats_password }}
+  relabel_configs:
+    - source_labels: [__address__]
+      target_label: instance
+      regex: '([^:]+).*'
+      replacement: '$1'

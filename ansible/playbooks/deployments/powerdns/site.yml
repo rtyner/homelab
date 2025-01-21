@@ -1,0 +1,84 @@
+- name: Deploy PowerDNS with PostgreSQL backend
+  hosts: pdns
+  become: yes
+  vars_files:
+    - group_vars/all.yml
+  
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required packages
+      apt:
+        name:
+          - postgresql
+          - postgresql-client
+          - pdns-server
+          - pdns-backend-pgsql
+          - pdns-recursor
+          - python3-psycopg2
+        state: present
+
+    - name: Create PowerDNS database
+      postgresql_db:
+        name: "{{ pdns_db_name }}"
+        state: present
+      become: yes
+      become_user: postgres
+
+    - name: Create PowerDNS database user
+      postgresql_user:
+        db: "{{ pdns_db_name }}"
+        name: "{{ pdns_db_user }}"
+        password: "{{ pdns_db_password }}"
+        priv: "ALL"
+        state: present
+      become: yes
+      become_user: postgres
+
+    - name: Create PowerDNS schema
+      postgresql_query:
+        db: "{{ pdns_db_name }}"
+        path_to_script: "templates/pdns-schema.sql.j2"
+      become: yes
+      become_user: postgres
+
+    - name: Configure PowerDNS Authoritative Server
+      template:
+        src: pdns.conf.j2
+        dest: /etc/powerdns/pdns.conf
+        owner: pdns
+        group: pdns
+        mode: '0640'
+      notify: restart pdns
+
+    - name: Configure PowerDNS Recursor
+      template:
+        src: pdns-recursor.conf.j2
+        dest: /etc/powerdns/recursor.conf
+        owner: pdns-recursor
+        group: pdns-recursor
+        mode: '0640'
+      notify: restart pdns-recursor
+
+    - name: Enable and start PowerDNS services
+      systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop:
+        - pdns
+        - pdns-recursor
+
+  handlers:
+    - name: restart pdns
+      systemd:
+        name: pdns
+        state: restarted
+
+    - name: restart pdns-recursor
+      systemd:
+        name: pdns-recursor
+        state: restarted

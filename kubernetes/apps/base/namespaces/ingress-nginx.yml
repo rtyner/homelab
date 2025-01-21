@@ -1,0 +1,9 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    field.cattle.io/projectId: p-2r268
+    kubernetes.io/metadata.name: ingress-nginx
+  name: ingress-nginx
+

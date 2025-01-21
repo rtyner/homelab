@@ -1,0 +1,24 @@
+zone "local.rtyner.com" {
+    type primary;
+    file "/var/cache/bind/zones/db.local.rtyner.com";
+    allow-transfer { 10.1.1.97; };  # Allow transfer to secondary
+    also-notify { 10.1.1.97; };     # Notify secondary of changes
+    allow-update { key "tsig-key.local.rtyner.com."; };
+    forwarders { };
+};
+
+zone "1.1.10.in-addr.arpa" {
+    type primary;
+    file "/var/cache/bind/zones/db.10.1.1";
+    allow-transfer { 10.1.1.97; };  # Allow transfer to secondary
+    also-notify { 10.1.1.97; };     # Notify secondary of changes
+    allow-update { key "tsig-key.local.rtyner.com."; };
+};
+
+zone "rtyner.com" {
+    type primary;
+    file "/var/cache/bind/zones/db.rtyner.com";
+    allow-transfer { 10.1.1.97; };  # Allow transfer to secondary
+    also-notify { 10.1.1.97; };     # Notify secondary of changes
+    allow-update { key "tsig-key.local.rtyner.com."; };
+};

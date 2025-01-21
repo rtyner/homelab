@@ -1,0 +1,51 @@
+version: "3.8"
+services:
+  web:
+    image: ghcr.io/hoarder-app/hoarder:${HOARDER_VERSION:-release}
+    restart: unless-stopped
+    volumes:
+      - data:/data
+    ports:
+      - 3000:3000
+    env_file:
+      - .env_hoarder
+    environment:
+      MEILI_ADDR: http://meilisearch:7700
+      BROWSER_WEB_URL: http://chrome:9222
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      DATA_DIR: /data
+      CRAWLER_NUM_WORKERS: 12
+      NFERENCE_CONTEXT_LENGTH: 4096
+      CRAWLER_DOWNLOAD_BANNER_IMAGE: true
+      CRAWLER_STORE_SCREENSHOT: true
+      CRAWLER_JOB_TIMEOUT_SEC: 60
+
+  chrome:
+    image: gcr.io/zenika-hub/alpine-chrome:123
+    restart: unless-stopped
+    command:
+      - --no-sandbox
+      - --disable-gpu
+      - --disable-dev-shm-usage
+      - --remote-debugging-address=0.0.0.0
+      - --remote-debugging-port=9222
+      - --hide-scrollbars
+  meilisearch:
+    image: getmeili/meilisearch:v1.11.1
+    restart: unless-stopped
+    env_file:
+      - .env_hoarder
+    environment:
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - meilisearch:/meili_data
+    networks:
+      - docker_npm-net
+
+volumes:
+  meilisearch:
+  data:
+
+networks:
+  docker_npm-net:
+    external: true

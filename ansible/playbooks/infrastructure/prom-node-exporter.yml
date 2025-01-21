@@ -1,0 +1,67 @@
+---
+- name: Install Node Exporter
+  hosts: nfs
+  become: true
+
+  handlers:
+    - name: restart node_exporter
+      service:
+        name: node_exporter
+        state: restarted
+
+  tasks:
+    - name: Create node_exporter user
+      user:
+        name: node_exporter
+        system: yes
+        shell: /usr/sbin/nologin
+
+    - name: Check if node exporter binary exists
+      stat:
+        path: /usr/local/bin/node_exporter
+      register: node_exporter_binary
+
+    - name: Check if node exporter service exists
+      stat:
+        path: /etc/systemd/system/node_exporter.service
+      register: node_exporter_service
+
+    - name: Download and extract node exporter
+      unarchive:
+        src: https://github.com/prometheus/node_exporter/releases/download/v1.7.0/node_exporter-1.7.0.linux-amd64.tar.gz
+        dest: /usr/local/bin
+        remote_src: yes
+      when: not node_exporter_binary.stat.exists
+
+    - name: Move node exporter binary
+      copy:
+        src: /usr/local/bin/node_exporter-1.7.0.linux-amd64/node_exporter
+        dest: /usr/local/bin/node_exporter
+        remote_src: yes
+        mode: '0755'
+      when: not node_exporter_binary.stat.exists
+
+    - name: Create node exporter service
+      copy:
+        dest: /etc/systemd/system/node_exporter.service
+        content: |
+          [Unit]
+          Description=Node Exporter
+          After=network.target
+          
+          [Service]
+          Type=simple
+          User=node_exporter
+          ExecStart=/usr/local/bin/node_exporter
+          
+          [Install]
+          WantedBy=multi-user.target
+      when: not node_exporter_service.stat.exists
+      notify: restart node_exporter
+
+    - name: Start and enable node_exporter service
+      systemd:
+        name: node_exporter
+        state: started
+        enabled: yes
+        daemon_reload: yes

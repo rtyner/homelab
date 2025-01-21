@@ -1,0 +1,449 @@
+---
+- name: Base Config
+  hosts: all
+  vars:
+    ansible_command_timeout: 300
+    ansible_timeout: 300
+    terminfo_content: |
+      #       Reconstructed via infocmp from file: /Applications/Ghostty.app/Contents/Resources/terminfo/78/xterm-ghostty
+      xterm-ghostty|ghostty|Ghostty,
+              am, bce, ccc, hs, km, mc5i, mir, msgr, npc, xenl, AX, Su, Tc, XT, fullkbd,
+              colors#256, cols#80, it#8, lines#24, pairs#32767,
+              acsc=++\,\,--..00``aaffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz{{||}}~~,
+              bel=^G, blink=\E[5m, bold=\E[1m, cbt=\E[Z, civis=\E[?25l,
+              clear=\E[H\E[2J, cnorm=\E[?12l\E[?25h, cr=^M,
+              csr=\E[%i%p1%d;%p2%dr, cub=\E[%p1%dD, cub1=^H,
+              cud=\E[%p1%dB, cud1=^J, cuf=\E[%p1%dC, cuf1=\E[C,
+              cup=\E[%i%p1%d;%p2%dH, cuu=\E[%p1%dA, cuu1=\E[A,
+              cvvis=\E[?12;25h, dch=\E[%p1%dP, dch1=\E[P, dim=\E[2m,
+              dl=\E[%p1%dM, dl1=\E[M, dsl=\E]2;\007, ech=\E[%p1%dX,
+              ed=\E[J, el=\E[K, el1=\E[1K, flash=\E[?5h$<100/>\E[?5l,
+              fsl=^G, home=\E[H, hpa=\E[%i%p1%dG, ht=^I, hts=\EH,
+              ich=\E[%p1%d@, ich1=\E[@, il=\E[%p1%dL, il1=\E[L, ind=^J,
+              indn=\E[%p1%dS,
+              initc=\E]4;%p1%d;rgb\:%p2%{255}%*%{1000}%/%2.2X/%p3%{255}%*%{1000}%/%2.2X/%p4%{255}%*%{1000}%/%2.2X\E\\,
+              invis=\E[8m, kDC=\E[3;2~, kEND=\E[1;2F, kHOM=\E[1;2H,
+              kIC=\E[2;2~, kLFT=\E[1;2D, kNXT=\E[6;2~, kPRV=\E[5;2~,
+              kRIT=\E[1;2C, kbs=\177, kcbt=\E[Z, kcub1=\EOD, kcud1=\EOB,
+              kcuf1=\EOC, kcuu1=\EOA, kdch1=\E[3~, kend=\EOF, kent=\EOM,
+              kf1=\EOP, kf10=\E[21~, kf11=\E[23~, kf12=\E[24~,
+              kf13=\E[1;2P, kf14=\E[1;2Q, kf15=\E[1;2R, kf16=\E[1;2S,
+              kf17=\E[15;2~, kf18=\E[17;2~, kf19=\E[18;2~, kf2=\EOQ,
+              kf20=\E[19;2~, kf21=\E[20;2~, kf22=\E[21;2~,
+              kf23=\E[23;2~, kf24=\E[24;2~, kf25=\E[1;5P, kf26=\E[1;5Q,
+              kf27=\E[1;5R, kf28=\E[1;5S, kf29=\E[15;5~, kf3=\EOR,
+              kf30=\E[17;5~, kf31=\E[18;5~, kf32=\E[19;5~,
+              kf33=\E[20;5~, kf34=\E[21;5~, kf35=\E[23;5~,
+              kf36=\E[24;5~, kf37=\E[1;6P, kf38=\E[1;6Q, kf39=\E[1;6R,
+              kf4=\EOS, kf40=\E[1;6S, kf41=\E[15;6~, kf42=\E[17;6~,
+              kf43=\E[18;6~, kf44=\E[19;6~, kf45=\E[20;6~,
+              kf46=\E[21;6~, kf47=\E[23;6~, kf48=\E[24;6~,
+              kf49=\E[1;3P, kf5=\E[15~, kf50=\E[1;3Q, kf51=\E[1;3R,
+              kf52=\E[1;3S, kf53=\E[15;3~, kf54=\E[17;3~,
+              kf55=\E[18;3~, kf56=\E[19;3~, kf57=\E[20;3~,
+              kf58=\E[21;3~, kf59=\E[23;3~, kf6=\E[17~, kf60=\E[24;3~,
+              kf61=\E[1;4P, kf62=\E[1;4Q, kf63=\E[1;4R, kf7=\E[18~,
+              kf8=\E[19~, kf9=\E[20~, khome=\EOH, kich1=\E[2~,
+              kind=\E[1;2B, kmous=\E[<, knp=\E[6~, kpp=\E[5~,
+              kri=\E[1;2A, oc=\E]104\007, op=\E[39;49m, rc=\E8,
+              rep=%p1%c\E[%p2%{1}%-%db, rev=\E[7m, ri=\EM,
+              rin=\E[%p1%dT, ritm=\E[23m, rmacs=\E(B, rmam=\E[?7l,
+              rmcup=\E[?1049l, rmir=\E[4l, rmkx=\E[?1l\E>, rmso=\E[27m,
+              rmul=\E[24m, rs1=\E]\E\\\Ec, sc=\E7,
+              setab=\E[%?%p1%{8}%<%t4%p1%d%e%p1%{16}%<%t10%p1%{8}%-%d%e48;5;%p1%d%;m,
+              setaf=\E[%?%p1%{8}%<%t3%p1%d%e%p1%{16}%<%t9%p1%{8}%-%d%e38;5;%p1%d%;m,
+              sgr=%?%p9%t\E(0%e\E(B%;\E[0%?%p6%t;1%;%?%p2%t;4%;%?%p1%p3%|%t;7%;%?%p4%t;5%;%?%p7%t;8%;m,
+              sgr0=\E(B\E[m, sitm=\E[3m, smacs=\E(0, smam=\E[?7h,
+              smcup=\E[?1049h, smir=\E[4h, smkx=\E[?1h\E=, smso=\E[7m,
+              smul=\E[4m, tbc=\E[3g, tsl=\E]2;, u6=\E[%i%d;%dR, u7=\E[6n,
+              u8=\E[?%[;0123456789]c, u9=\E[c, vpa=\E[%i%p1%dd,
+              BD=\E[?2004l, BE=\E[?2004h, Clmg=\E[s,
+              Cmg=\E[%i%p1%d;%p2%ds, Dsmg=\E[?69l, E3=\E[3J,
+              Enmg=\E[?69h, Ms=\E]52;%p1%s;%p2%s\007, PE=\E[201~,
+              PS=\E[200~, RV=\E[>c, Se=\E[2 q,
+              Setulc=\E[58\:2\:\:%p1%{65536}%/%d\:%p1%{256}%/%{255}%&%d\:%p1%{255}%&%d%;m,
+              Smulx=\E[4\:%p1%dm, Ss=\E[%p1%d q,
+              Sync=\E[?2026%?%p1%{1}%-%tl%eh%;,
+              XM=\E[?1006;1000%?%p1%{1}%=%th%el%;, XR=\E[>0q,
+              fd=\E[?1004l, fe=\E[?1004h, kDC3=\E[3;3~, kDC4=\E[3;4~,
+              kDC5=\E[3;5~, kDC6=\E[3;6~, kDC7=\E[3;7~, kDN=\E[1;2B,
+              kDN3=\E[1;3B, kDN4=\E[1;4B, kDN5=\E[1;5B, kDN6=\E[1;6B,
+              kDN7=\E[1;7B, kEND3=\E[1;3F, kEND4=\E[1;4F,
+              kEND5=\E[1;5F, kEND6=\E[1;6F, kEND7=\E[1;7F,
+              kHOM3=\E[1;3H, kHOM4=\E[1;4H, kHOM5=\E[1;5H,
+              kHOM6=\E[1;6H, kHOM7=\E[1;7H, kIC3=\E[2;3~, kIC4=\E[2;4~,
+              kIC5=\E[2;5~, kIC6=\E[2;6~, kIC7=\E[2;7~, kLFT3=\E[1;3D,
+              kLFT4=\E[1;4D, kLFT5=\E[1;5D, kLFT6=\E[1;6D,
+              kLFT7=\E[1;7D, kNXT3=\E[6;3~, kNXT4=\E[6;4~,
+              kNXT5=\E[6;5~, kNXT6=\E[6;6~, kNXT7=\E[6;7~,
+              kPRV3=\E[5;3~, kPRV4=\E[5;4~, kPRV5=\E[5;5~,
+              kPRV6=\E[5;6~, kPRV7=\E[5;7~, kRIT3=\E[1;3C,
+              kRIT4=\E[1;4C, kRIT5=\E[1;5C, kRIT6=\E[1;6C,
+              kRIT7=\E[1;7C, kUP=\E[1;2A, kUP3=\E[1;3A, kUP4=\E[1;4A,
+              kUP5=\E[1;5A, kUP6=\E[1;6A, kUP7=\E[1;7A, kxIN=\E[I,
+              kxOUT=\E[O, rmxx=\E[29m, rv=\E\\[[0-9]+;[0-9]+;[0-9]+c,
+              setrgbb=\E[48\:2\:%p1%d\:%p2%d\:%p3%dm,
+              setrgbf=\E[38\:2\:%p1%d\:%p2%d\:%p3%dm, smxx=\E[9m,
+              xm=\E[<%i%p3%d;%p1%d;%p2%d;%?%p4%tM%em%;,
+              xr=\EP>\\|[ -~]+a\E\\,
+
+  become: true
+
+  handlers:
+    - name: restart ssh
+      service:
+        name: ssh
+        state: restarted
+
+    - name: restart node_exporter
+      service:
+        name: node_exporter
+        state: restarted      
+
+    - name: Clear shell cache
+      command: hash -r
+
+  tasks:
+    - name: Create temporary directory
+      tempfile:
+        state: directory
+        suffix: terminfo
+      register: temp_dir
+
+    - name: Create terminfo file
+      copy:
+        content: "{{ terminfo_content }}"
+        dest: "{{ temp_dir.path }}/xterm-ghostty.info"
+        mode: '0644'
+
+    - name: Install ncurses-base (Debian/Ubuntu)
+      apt:
+        name: ncurses-base
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Install ncurses (RedHat/CentOS)
+      yum:
+        name: ncurses
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Compile terminfo file
+      command: tic -x "{{ temp_dir.path }}/xterm-ghostty.info"
+      register: tic_result
+      changed_when: tic_result.rc == 0
+      failed_when: tic_result.rc != 0
+
+    - name: Cleanup temporary directory
+      file:
+        path: "{{ temp_dir.path }}"
+        state: absent
+
+    - name: Disable systemd-resolved
+      systemd:
+        name: systemd-resolved
+        state: stopped
+        enabled: false
+        daemon_reload: yes
+      become: true
+
+    - name: Check if resolv.conf is immutable
+      command: lsattr /etc/resolv.conf
+      register: resolv_attrs
+      changed_when: false
+      ignore_errors: true
+    
+    - name: Remove immutable attribute if it exists
+      command: chattr -i /etc/resolv.conf
+      when: "resolv_attrs.stdout is defined and 'i' in resolv_attrs.stdout"
+      ignore_errors: true
+
+    - name: Remove resolv.conf symlink
+      file:
+        path: /etc/resolv.conf
+        state: absent
+      become: true
+    
+    - name: Create custom resolv.conf
+      template:
+        src: resolv.conf.j2
+        dest: /etc/resolv.conf
+        mode: '0644'
+      become: true
+    
+    - name: Make resolv.conf immutable
+      command: chattr +i /etc/resolv.conf
+      become: true
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: yes
+
+    - name: nopasswd sudo
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        backup: yes
+        regexp: '^%sudo'
+        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+        
+    - name: disable root login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        backup: yes        
+        regexp: '^PermitRootLogin'
+        line: "PermitRootLogin no"
+      notify: restart ssh
+  
+    - name: standard packages
+      apt:
+        pkg: 
+          - vim
+          - bat
+          - git
+          - gpg
+          - htop
+          - curl
+          - unzip
+          - rsync
+          - rclone
+          - dnsutils
+          - python3-pip
+          - build-essential
+          - python3-setuptools
+        state: present
+        update_cache: yes
+
+    - name: Install NFS client on Ubuntu
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+          - nfs-common
+          - cifs-utils
+
+    - name: Create .smbcreds file from template
+      template:
+        src: smbcreds.j2
+        dest: /home/rt/.smbcreds
+        mode: '0600'
+        owner: rt
+        group: rt
+      no_log: true
+
+    - name: Create mount directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: rt
+        group: rt
+        mode: '0755'
+        recurse: yes
+      with_items:
+        - /home/rt/mount/shares
+
+
+    - name: Configure fstab entries
+      blockinfile:
+        path: /etc/fstab
+        backup: yes
+        block: |
+          //10.1.1.8/shares /home/rt/mount/shares cifs credentials=/home/rt/.smbcreds,uid=rt,gid=rt,file_mode=0755,dir_mode=0755 0 0
+
+    - name: Mount all shares
+      ansible.posix.mount:
+        path: "{{ item.path }}"
+        src: "{{ item.src }}"
+        fstype: "{{ item.fstype }}"
+        opts: "{{ item.opts }}"
+        state: mounted
+      with_items:     
+        - { path: '/home/rt/mount/shares', src: '//10.1.1.8/shares', fstype: 'cifs', opts: 'credentials=/home/rt/.smbcreds,uid=rt,gid=rt,file_mode=0755,dir_mode=0755' }
+
+    - name: Test mount points
+      command: mountpoint -q "{{ item }}"
+      register: mount_test
+      failed_when: mount_test.rc not in [0, 1]
+      changed_when: false
+      with_items:
+        - /home/rt/mount/shares
+
+    - name: Create node_exporter user
+      user:
+        name: node_exporter
+        system: yes
+        shell: /usr/sbin/nologin
+
+    - name: Check if node exporter binary exists
+      stat:
+        path: /usr/local/bin/node_exporter
+      register: node_exporter_binary
+
+    - name: Check if node exporter service exists
+      stat:
+        path: /etc/systemd/system/node_exporter.service
+      register: node_exporter_service
+
+    - name: Download and extract node exporter
+      unarchive:
+        src: https://github.com/prometheus/node_exporter/releases/download/v1.7.0/node_exporter-1.7.0.linux-amd64.tar.gz
+        dest: /usr/local/bin
+        remote_src: yes
+      when: not node_exporter_binary.stat.exists
+
+    - name: Move node exporter binary
+      copy:
+        src: /usr/local/bin/node_exporter-1.7.0.linux-amd64/node_exporter
+        dest: /usr/local/bin/node_exporter
+        remote_src: yes
+        mode: '0755'
+      when: not node_exporter_binary.stat.exists
+
+    - name: Create node exporter service
+      copy:
+        dest: /etc/systemd/system/node_exporter.service
+        content: |
+          [Unit]
+          Description=Node Exporter
+          After=network.target
+          
+          [Service]
+          Type=simple
+          User=node_exporter
+          ExecStart=/usr/local/bin/node_exporter
+          
+          [Install]
+          WantedBy=multi-user.target
+      when: not node_exporter_service.stat.exists
+      notify: restart node_exporter
+
+    - name: Start and enable node_exporter service
+      systemd:
+        name: node_exporter
+        state: started
+        enabled: yes
+        daemon_reload: yes
+
+    - name: Install QEMU guest agent
+      package:
+        name: qemu-guest-agent
+        state: present
+    
+    - name: Enable and start QEMU guest agent service
+      systemd:
+        name: qemu-guest-agent
+        enabled: yes
+        state: started
+
+    - name: Create a new regular user with sudo privileges
+      user:
+        name: rt
+        state: present
+        groups: sudo
+        append: true
+        create_home: true
+        
+    - name: Install unattended-upgrades package
+      apt:
+        name: unattended-upgrades
+        state: present
+
+    - name: Enable automatic updates
+      debconf:
+        name: unattended-upgrades
+        question: unattended-upgrades/enable_auto_updates
+        vtype: boolean
+        value: 'true'
+
+    - name: Configure unattended-upgrades
+      lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: '^//Unattended-Upgrade::Allowed-Origins', line: 'Unattended-Upgrade::Allowed-Origins { "${distro_id}:${distro_codename}"; "${distro_id}:${distro_codename}-security"; };' }
+        - { regexp: '^//Unattended-Upgrade::Mail "root"', line: 'Unattended-Upgrade::Mail "root@localhost";' }
+        - { regexp: '^//Unattended-Upgrade::Automatic-Reboot "false";', line: 'Unattended-Upgrade::Automatic-Reboot "true";' }
+        - { regexp: '^//Unattended-Upgrade::Remove-Unused-Dependencies "false";', line: 'Unattended-Upgrade::Remove-Unused-Dependencies "true";' }
+
+    - name: Ensure unattended-upgrades service is running
+      service:
+        name: unattended-upgrades
+        state: started
+        enabled: yes
+
+    - name: bashrc
+      get_url: 
+        url: https://gitlab.rtyner.com/rt/homelab/-/raw/main/configs/.bashrc
+        dest: /home/rt
+
+    - name: Deploy and Configure Tailscale
+      block:
+        - name: Check if Tailscale is installed
+          command: which tailscale
+          register: tailscale_check
+          changed_when: false
+          failed_when: false
+    
+        - name: Get Tailscale service status
+          service_facts:
+          when: tailscale_check.rc == 0
+    
+        - name: Check Tailscale connection status
+          command: tailscale status
+          register: tailscale_status
+          changed_when: false
+          failed_when: false
+          when: tailscale_check.rc == 0
+    
+        - name: Skip role if Tailscale is already running and connected
+          set_fact:
+            skip_tailscale_role: true
+          when: 
+            - tailscale_check.rc == 0
+            - "'tailscaled.service' in ansible_facts.services"
+            - "ansible_facts.services['tailscaled.service'].state == 'running'"
+            - "tailscale_status.rc == 0"
+            - "'Started' in tailscale_status.stdout"
+    
+        - name: Verify auth key is set
+          fail:
+            msg: "TAILSCALE_AUTH_KEY environment variable is not set"
+          when: lookup('env', 'TAILSCALE_AUTH_KEY') == ''
+    
+        - name: Set Tailscale arguments
+          set_fact:
+            tailscale_up_args: "--accept-routes --advertise-exit-node"
+    
+        - name: Include Tailscale role
+          include_role:
+            name: artis3n.tailscale
+          vars:
+            tailscale_up_skip: false
+            tailscale_accept_dns: true
+            tailscale_logout: false
+            tailscale_force_reauth: true
+            tailscale_authkey: "{{ lookup('env', 'TAILSCALE_AUTH_KEY') }}"
+            tailscale_up_args: "{{ tailscale_up_args }}"
+          when: not skip_tailscale_role | default(false)
+    
+        - name: Ensure Tailscale is up
+          command: "tailscale up {{ tailscale_up_args }}"
+          when: 
+            - tailscale_check is defined
+            - tailscale_check.rc == 0
+            - (tailscale_status.rc != 0 or "'Started' not in tailscale_status.stdout")
+      become: true
+
+    - name: Reboot the system
+      reboot:
+        msg: "System is being rebooted after successful configuration"
+        reboot_timeout: 300

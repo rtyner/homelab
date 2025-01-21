@@ -1,0 +1,16 @@
+---
+- name: Disable multipathd
+  hosts: k3s
+  become: true
+  tasks:
+    - name: Stop multipathd service
+      systemd:
+        name: multipathd
+        state: stopped
+        enabled: no
+        daemon_reload: yes
+    - name: disable multipathd
+      command: systemctl disable multipathd
+      become: true
+      ignore_errors: yes
+      changed_when: false

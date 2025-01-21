@@ -1,0 +1,32 @@
+---
+- name: Deploy GitLab
+  hosts: new_deployment
+  become: yes
+  roles: 
+    - role: geerlingguy.gitlab
+
+  tasks:
+    - name: Install GitLab
+      include_role:
+        name: geerlingguy.gitlab
+      vars:
+        gitlab_external_url: "https://git.local.rtyner.com"
+        gitlab_port: 80
+        gitlab_https: false
+        gitlab_backup_cron_hour: 2
+        gitlab_backup_cron_minute: 30
+        gitlab_backup_cron_month: "*"
+        gitlab_backup_cron_weekday: "*"
+        gitlab_backup_cron_day: "*"
+        gitlab_git_data_dir: "/srv/gitlab/git-data"
+        gitlab_backup_path: /home/rt/mount/backups/gitlab
+        gitlab_version: "ee"
+        gitlab_dependencies:
+          - openssh-server
+          - postfix
+          - curl
+          - openssl
+          - tzdata
+        gitlab_timezone: "America/New_York"        
+        gitlab_backup_keep_time: "604800"
+        gitlab_download_validate_certs: true

@@ -1,0 +1,25 @@
+---
+- name: Manage DNS Records
+  hosts: dns_servers
+  become: yes
+  vars:
+    # These can be overridden by -e parameters
+    vm_hostname: "{{ vm_hostname | default(None) }}"
+    vm_ip: "{{ vm_ip | default(None) }}"
+    
+  pre_tasks:
+    - name: Add new record to dns_records if vm_hostname and vm_ip are provided
+      set_fact:
+        dns_records: "{{ dns_records + [{'hostname': vm_hostname, 'ip': vm_ip}] }}"
+      when: vm_hostname is defined and vm_hostname != None and vm_ip is defined and vm_ip != None
+
+  roles:
+    - dns_management
+
+  post_tasks:
+    - name: Verify DNS resolution for new record
+      shell: "dig @{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }} {{ vm_hostname }}.local.rtyner.com +short"
+      register: dig_result
+      when: vm_hostname is defined and vm_hostname != None
+      failed_when: dig_result.rc != 0 or dig_result.stdout != vm_ip
+      changed_when: false

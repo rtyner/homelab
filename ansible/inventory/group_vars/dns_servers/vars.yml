@@ -1,0 +1,4 @@
+# Reference the vault variables
+pdns_db_password: "{{ vault_pdns_db_password }}"
+mysql_root_password: "{{ vault_mysql_root_password }}"
+mysql_replication_password: "{{ vault_mysql_replication_password }}"

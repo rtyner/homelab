@@ -1,0 +1,26 @@
+# secondary.cnf.j2
+[mysqld]
+# Replication configuration
+server-id = 2
+relay-log = mysql-relay-bin
+relay-log-purge = 1
+read_only = 1
+log_slave_updates = 1
+
+# Basic settings
+bind-address = {{ ansible_host }}
+innodb_buffer_pool_size = 256M
+innodb_flush_log_at_trx_commit = 1
+
+# PowerDNS specific optimizations
+max_connections = 100
+thread_cache_size = 10
+query_cache_size = 32M
+query_cache_type = 1
+
+# Character set
+character-set-server = utf8mb4
+collation-server = utf8mb4_general_ci
+
+# Replication source
+replicate-do-db = powerdns
