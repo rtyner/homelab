@@ -1,0 +1,93 @@
+[deploy]
+
+[all]
+dns01 ansible_host=dns-prod-01.local.rtyner.com.
+dns02 ansible_host=dns-prod-02.local.rtyner.com.
+pg01 ansible_host=pg-prod-01.local.rtyner.com.
+pg02 ansible_host=pg-prod-02.local.rtyner.com.
+pg03 ansible_host=pg-prod-03.local.rtyner.com.
+gitlab ansible_host=gitlab-prod-01.local.rtyner.com.
+arch01 ansible_host=arch-dev-01.local.rtyner.com.
+arch02 ansible_host=arch-dev-02.local.rtyner.com.
+pbs01 ansible_host=pbs-prod-01.local.rtyner.com.
+pve01 ansible_host=pve-prod-01.local.rtyner.com.
+pve02 ansible_host=pve-prod-02.local.rtyner.com.
+pve03 ansible_host=pve-prod-03.local.rtyner.com.
+docker01 ansible_host=docker-prod-01.local.rtyner.com.
+docker02 ansible_host=docker-prod-02.local.rtyner.com.
+nextcloud ansible_host=nextcloud-prod-01.local.rtyner.com.
+monitor ansible_host=monitor-prod-01.local.rtyner.com.
+fw01 ansible_host=fw01.local.rtyner.com.
+k3s-master01 ansible_host=k3s-prod-master-01.local.rtyner.com.
+k3s-master02 ansible_host=k3s-prod-master-02.local.rtyner.com.
+k3s-master03 ansible_host=k3s-prod-master-03.local.rtyner.com.
+k3s-worker01 ansible_host=k3s-prod-worker-01.local.rtyner.com.
+k3s-worker02 ansible_host=k3s-prod-worker-02.local.rtyner.com.
+k3s-worker03 ansible_host=k3s-prod-worker-03.local.rtyner.com.
+k3s-worker04 ansible_host=k3s-prod-worker-04.local.rtyner.com.
+k3s-worker05 ansible_host=k3s-prod-worker-05.local.rtyner.com.
+k3s-worker06 ansible_host=k3s-prod-worker-06.local.rtyner.com.
+caddy ansible_host=caddy-prod-01.local.rtyner.com.
+aptcache ansible_host=aptcache-prod-01.local.rtyner.com.
+
+[pve]
+pbs01 ansible_host=pbs-prod-01.local.rtyner.com.
+pve01 ansible_host=pve-prod-01.local.rtyner.com.
+pve02 ansible_host=pve-prod-02.local.rtyner.com.
+pve03 ansible_host=pve-prod-03.local.rtyner.com.
+
+[dns]
+dns01 ansible_host=dns-prod-01.local.rtyner.com.
+dns02 ansible_host=dns-prod-02.local.rtyner.com.
+
+[debian]
+dns01 ansible_host=dns-prod-01.local.rtyner.com.
+dns02 ansible_host=dns-prod-02.local.rtyner.com.
+pg01 ansible_host=pg-prod-01.local.rtyner.com.
+pg02 ansible_host=pg-prod-02.local.rtyner.com.
+pg03 ansible_host=pg-prod-03.local.rtyner.com.
+gitlab ansible_host=gitlab-prod-01.local.rtyner.com.
+docker01 ansible_host=docker-prod-01.local.rtyner.com.
+docker02 ansible_host=docker-prod-02.local.rtyner.com.
+nextcloud ansible_host=nextcloud-prod-01.local.rtyner.com.
+monitor ansible_host=monitor-prod-01.local.rtyner.com.
+k3s-master01 ansible_host=k3s-prod-master-01.local.rtyner.com.
+k3s-master02 ansible_host=k3s-prod-master-02.local.rtyner.com.
+k3s-master03 ansible_host=k3s-prod-master-03.local.rtyner.com.
+k3s-worker01 ansible_host=k3s-prod-worker-01.local.rtyner.com.
+k3s-worker02 ansible_host=k3s-prod-worker-02.local.rtyner.com.
+k3s-worker03 ansible_host=k3s-prod-worker-03.local.rtyner.com.
+k3s-worker04 ansible_host=k3s-prod-worker-04.local.rtyner.com.
+k3s-worker05 ansible_host=k3s-prod-worker-05.local.rtyner.com.
+k3s-worker06 ansible_host=k3s-prod-worker-06.local.rtyner.com.
+caddy ansible_host=caddy-prod-01.local.rtyner.com.
+aptcache ansible_host=aptcache-prod-01.local.rtyner.com.
+
+[docker]
+docker01 ansible_host=docker-prod-01.local.rtyner.com.
+docker02 ansible_host=docker-prod-02.local.rtyner.com.
+
+[network]
+
+[truenas]
+nas01 ansible_host=nas01.local.rtyner.com.
+nas02 ansible_host=nas02.local.rtyner.com.
+
+[arch]
+arch01 ansible_host=arch-dev-01.local.rtyner.com.
+arch02 ansible_host=arch-dev-02.local.rtyner.com.
+
+[k3s]
+k3s-master01 ansible_host=k3s-prod-master-01.local.rtyner.com.
+k3s-master02 ansible_host=k3s-prod-master-02.local.rtyner.com.
+k3s-master03 ansible_host=k3s-prod-master-03.local.rtyner.com.
+k3s-worker01 ansible_host=k3s-prod-worker-01.local.rtyner.com.
+k3s-worker02 ansible_host=k3s-prod-worker-02.local.rtyner.com.
+k3s-worker03 ansible_host=k3s-prod-worker-03.local.rtyner.com.
+k3s-worker04 ansible_host=k3s-prod-worker-04.local.rtyner.com.
+k3s-worker05 ansible_host=k3s-prod-worker-05.local.rtyner.com.
+k3s-worker06 ansible_host=k3s-prod-worker-06.local.rtyner.com.
+
+[testing]
+
+[fw]

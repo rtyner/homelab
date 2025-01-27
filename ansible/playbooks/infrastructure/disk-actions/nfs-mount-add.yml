@@ -1,0 +1,69 @@
+---
+- name: Configure NFS mount
+  hosts: all
+  become: yes
+  tasks:
+    - name: Check OS family
+      ansible.builtin.set_fact:
+        is_arch: "{{ ansible_facts['os_family'] == 'Archlinux' }}"
+        is_ubuntu: "{{ ansible_facts['os_family'] == 'Debian' }}"
+
+    - name: Install NFS client on Ubuntu
+      apt:
+        name: nfs-common
+        state: present
+        update_cache: yes
+      when: is_ubuntu
+
+    - name: Install NFS client on Arch
+      pacman:
+        name: nfs-utils
+        state: present
+        update_cache: yes
+      when: is_arch
+
+    - name: Enable and start NFS services on Arch
+      systemd:
+        name: "{{ item }}"
+        enabled: yes
+        state: started
+      with_items:
+        - nfs-client.target
+        - rpc-statd.service
+      when: is_arch
+
+    - name: Create mount point directory structure
+      file:
+        path: "/home/rt/mount/nfs-file-01"
+        state: directory
+        owner: rt
+        group: rt
+        mode: '0755'
+        recurse: yes
+
+    - name: Add NFS mount to fstab
+      mount:
+        path: "/home/rt/mount/nfs-file-01"
+        src: "10.1.1.21:/datapool/nfs"
+        fstype: nfs
+        opts: rw,sync,hard,intr
+        state: mounted
+
+    - name: Ensure correct permissions
+      file:
+        path: "/home/rt/mount/nfs-file-01"
+        owner: rt
+        group: rt
+        mode: '0755'
+        recurse: yes
+
+    - name: Test mount point
+      command: mountpoint -q "/home/rt/mount/nfs-file-01"
+      register: mount_test
+      failed_when: mount_test.rc not in [0, 1]
+      changed_when: false
+
+    - name: Verify mount
+      debug:
+        msg: "NFS mount successful on {{ 'Arch Linux' if is_arch else 'Ubuntu' }}"
+      when: mount_test.rc == 0

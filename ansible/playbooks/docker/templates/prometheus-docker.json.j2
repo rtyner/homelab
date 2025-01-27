@@ -1,0 +1,34 @@
+{
+    "metrics-addr": "0.0.0.0:9323",
+    "experimental": true,
+    "storage-driver": "{{ docker_storage_driver }}",
+    "log-driver": "{{ docker_log_driver }}",
+    "log-opts": {
+        "max-size": "{{ docker_max_container_log_size }}",
+        "max-file": "{{ docker_max_container_log_files }}"
+    },
+    "labels": [
+        "environment=production",
+        "monitored=true"
+    ],
+    "default-ulimits": {
+        "nofile": {
+            "Name": "nofile",
+            "Hard": 64000,
+            "Soft": 64000
+        }
+    },
+    "dns": ["10.1.1.96", "10.1.1.97"],
+    "dns-search": ["local.rtyner.com"],
+    "log-level": "info",
+    "live-restore": true,
+    "iptables": true,
+    "debug": false,
+    "telemetry": {
+        "prometheus": {
+            "enabled": true,
+            "path": "/metrics",
+            "port": 9323
+        }
+    }
+}

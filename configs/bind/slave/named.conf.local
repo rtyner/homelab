@@ -1,0 +1,18 @@
+zone "local.rtyner.com" {
+    type slave;
+    file "/var/cache/bind/zones/db.local.rtyner.com";
+    masters { 10.10.1.10; };
+    forwarders { };
+};
+
+zone "10.in-addr.arpa" {
+    type slave;
+    file "/var/cache/bind/zones/db.10.in-addr.arpa";
+    masters { 10.10.1.10; };
+};
+
+zone "rtyner.com" {
+    type slave;
+    file "/var/cache/bind/zones/db.rtyner.com";
+    masters { 10.10.1.10; };
+};

@@ -1,0 +1,316 @@
+Current configuration:
+!
+ver 08.0.95pT213
+!
+stack unit 1
+  module 1 icx7250-48p-poe-port-management-module
+  module 2 icx7250-sfp-plus-8port-80g-module
+  stack-port 1/2/1
+  stack-port 1/2/3
+!
+!
+!
+!
+!
+vlan 1 name DEFAULT-VLAN by port
+ router-interface ve 1
+!
+vlan 5 name user by port
+ tagged ethe 1/1/48
+ router-interface ve 5
+!
+vlan 10 name data by port
+ tagged ethe 1/1/48
+ untagged ethe 1/1/5 to 1/1/12
+ router-interface ve 10
+!
+vlan 20 name storage by port
+ tagged ethe 1/1/48
+ untagged ethe 1/2/1 ethe 1/2/3 ethe 1/2/5 to 1/2/6
+ router-interface ve 20
+!
+vlan 30 name cluster by port
+ tagged ethe 1/1/48
+ untagged ethe 1/1/44 ethe 1/2/2 ethe 1/2/4
+ router-interface ve 30
+!
+vlan 40 name management by port
+ tagged ethe 1/1/48
+!
+vlan 50 name iot by port
+ tagged ethe 1/1/48
+!
+vlan 60 name dmz by port
+ tagged ethe 1/1/48
+!
+vlan 70 name jump by port
+ tagged ethe 1/1/48
+!
+vlan 80 name guest by port
+ tagged ethe 1/1/48
+!
+vlan 330 by port
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+optical-monitor
+optical-monitor non-ruckus-optic-enable
+aaa authentication web-server default local
+aaa authentication login default local
+chassis fanless all
+jumbo
+enable aaa console
+hostname core-sw01
+ip dhcp-client disable
+ip dns domain-list local.rtyner.com
+ip dns server-address 10.1.1.96 10.1.1.97
+ip route 0.0.0.0/0 10.1.1.1
+!
+no telnet server
+username super password .....
+!
+!
+!
+!
+clock summer-time
+clock timezone gmt GMT-05
+!
+!
+ntp
+ disable serve
+ server 216.239.35.0
+ server 216.239.35.4
+!
+!
+!
+manager disable
+!
+!
+manager port-list 987
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface ethernet 1/1/1
+ no inline power
+!
+interface ethernet 1/1/2
+ no inline power
+!
+interface ethernet 1/1/3
+ no inline power
+!
+interface ethernet 1/1/4
+ no inline power
+!
+interface ethernet 1/1/5
+ port-name pve01 data
+ no inline power
+!
+interface ethernet 1/1/6
+ port-name pve01 data
+ no inline power
+!
+interface ethernet 1/1/7
+ port-name pve01 data
+ no inline power
+!
+interface ethernet 1/1/8
+ port-name pve01 data
+ no inline power
+!
+interface ethernet 1/1/9
+ port-name pve02 data
+ no inline power
+!
+interface ethernet 1/1/10
+ port-name pve02 data
+ no inline power
+!
+interface ethernet 1/1/11
+ port-name pve02 data
+ no inline power
+!
+interface ethernet 1/1/12
+ port-name pve02 data
+ no inline power
+!
+interface ethernet 1/1/13
+ no inline power
+!
+interface ethernet 1/1/14
+ no inline power
+!
+interface ethernet 1/1/15
+ no inline power
+!
+interface ethernet 1/1/16
+ no inline power
+!
+interface ethernet 1/1/17
+ no inline power
+!
+interface ethernet 1/1/18
+ no inline power
+!
+interface ethernet 1/1/19
+ no inline power
+!
+interface ethernet 1/1/20
+ no inline power
+!
+interface ethernet 1/1/21
+ no inline power
+!
+interface ethernet 1/1/22
+ no inline power
+!
+interface ethernet 1/1/23
+ no inline power
+!
+interface ethernet 1/1/24
+ no inline power
+!
+interface ethernet 1/1/25
+ no inline power
+!
+interface ethernet 1/1/26
+ no inline power
+!
+interface ethernet 1/1/27
+ no inline power
+!
+interface ethernet 1/1/28
+ no inline power
+!
+interface ethernet 1/1/29
+ no inline power
+!
+interface ethernet 1/1/30
+ no inline power
+!
+interface ethernet 1/1/31
+ no inline power
+!
+interface ethernet 1/1/32
+ no inline power
+!
+interface ethernet 1/1/33
+ no inline power
+!
+interface ethernet 1/1/34
+ no inline power
+!
+interface ethernet 1/1/35
+ no inline power
+!
+interface ethernet 1/1/36
+ no inline power
+!
+interface ethernet 1/1/37
+ no inline power
+!
+interface ethernet 1/1/38
+ no inline power
+!
+interface ethernet 1/1/39
+ no inline power
+!
+interface ethernet 1/1/40
+ no inline power
+!
+interface ethernet 1/1/41
+ no inline power
+!
+interface ethernet 1/1/42
+ no inline power
+!
+interface ethernet 1/1/43
+ no inline power
+!
+interface ethernet 1/1/44
+ port-name pve03 cluster
+ no inline power
+!
+interface ethernet 1/1/45
+ no inline power
+!
+interface ethernet 1/1/46
+ no inline power
+!
+interface ethernet 1/1/47
+ no inline power
+!
+interface ethernet 1/1/48
+ no inline power
+!
+interface ethernet 1/2/1
+ port-name pve01 storage
+ no optical-monitor
+!
+interface ethernet 1/2/2
+ port-name pve01 cluster
+ no optical-monitor
+!
+interface ethernet 1/2/3
+ port-name pve02 storage
+ no optical-monitor
+!
+interface ethernet 1/2/4
+ port-name pve02 cluster
+ no optical-monitor
+!
+interface ethernet 1/2/5
+ port-name nas01 storage
+ no optical-monitor
+!
+interface ethernet 1/2/6
+ port-name nas02 storage
+ no optical-monitor
+!
+interface ve 1
+ ip address 10.1.1.251 255.255.255.0
+!
+interface ve 5
+ ip address 10.5.1.1 255.255.255.0
+!
+interface ve 10
+ ip address 10.10.1.1 255.255.255.0
+!
+interface ve 20
+ ip address 10.20.1.1 255.255.255.0
+!
+interface ve 30
+ ip address 10.30.1.1 255.255.255.0
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+end

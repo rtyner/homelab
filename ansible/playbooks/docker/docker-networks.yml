@@ -1,0 +1,57 @@
+---
+- name: Configure Docker subnet ranges
+  hosts: docker
+  become: true
+  tasks:
+    - name: Ensure /etc/docker directory exists
+      file:
+        path: /etc/docker
+        state: directory
+        mode: '0755'
+
+    - name: Configure Docker daemon.json
+      copy:
+        content: |
+          {
+            "default-address-pools": [
+              {
+                "base": "10.194.0.0/16",
+                "size": 24
+              },
+              {
+                "base": "10.195.0.0/16",
+                "size": 24
+              },
+              {
+                "base": "10.196.0.0/16",
+                "size": 24
+              },
+              {
+                "base": "10.197.0.0/16",
+                "size": 24
+              },
+              {
+                "base": "10.198.0.0/16",
+                "size": 24
+              },
+              {
+                "base": "10.199.0.0/16",
+                "size": 24
+              }
+            ]
+          }
+        dest: /etc/docker/daemon.json
+        mode: '0644'
+      notify: restart docker
+
+    - name: Ensure Docker is started and enabled
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: restart docker
+      service:
+        name: docker
+        state: restarted

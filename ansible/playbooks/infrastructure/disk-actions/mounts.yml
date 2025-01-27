@@ -1,0 +1,105 @@
+---
+# run with ansible-playbook playbooks/mounts.yml -e "smb_user=your_username smb_pass=your_password"
+- name: Configure NFS and SMB mounts
+  hosts: new_deployment
+  become: yes
+  vars:
+    smb_username: "{{ smb_user }}"
+    smb_password: "{{ smb_pass }}"
+  tasks:
+    - name: Check OS family
+      ansible.builtin.set_fact:
+        is_arch: "{{ ansible_facts['os_family'] == 'Archlinux' }}"
+        is_ubuntu: "{{ ansible_facts['os_family'] == 'Debian' }}"
+
+    - name: Install NFS client on Ubuntu
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+          - nfs-common
+          - cifs-utils
+      when: is_ubuntu
+
+    - name: Install NFS client on Arch
+      pacman:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+          - nfs-utils
+          - cifs-utils
+      when: is_arch
+
+    - name: Enable and start NFS services on Arch
+      systemd:
+        name: "{{ item }}"
+        enabled: yes
+        state: started
+      with_items:
+        - nfs-client.target
+        - rpc-statd.service
+      when: is_arch
+
+    - name: Create mount directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: rt
+        group: rt
+        mode: '0755'
+        recurse: yes
+      with_items:
+        - /home/rt/mount/nfs-file-01
+        - /home/rt/mount/nfs-rt
+        - /home/rt/mount/bdp
+        - /home/rt/mount/red
+        - /home/rt/mount/pve4_data
+
+    - name: Create SMB credentials file
+      template:
+        src: smbcreds.j2
+        dest: /home/rt/.smbcreds
+        owner: rt
+        group: rt
+        mode: '0600'
+
+    - name: Configure fstab entries
+      blockinfile:
+        path: /etc/fstab
+        backup: yes
+        block: |
+          10.1.1.7:/data/pve4_data_nfs    /home/rt/mount/pve4_data    nfs    rw,sync,hard,intr    0    0
+          10.1.1.6:/mnt/pool-1-14t/rt /home/rt/mount/nfs-rt nfs rw,sync,hard,intr 0 0
+          10.1.1.21:/datapool/nfs     /home/rt/mount/nfs-file-01    nfs    rw,sync,hard,intr    0    0
+          //10.1.1.6/big-dick-pool    /home/rt/mount/bdp           cifs   credentials=/home/rt/.smbcreds,uid=rt,gid=rt,file_mode=0755,dir_mode=0755    0    0
+          //10.1.1.6/red-share        /home/rt/mount/red           cifs   credentials=/home/rt/.smbcreds,uid=rt,gid=rt,file_mode=0755,dir_mode=0755    0    0
+
+    - name: Mount all shares
+      mount:
+        path: "{{ item.path }}"
+        src: "{{ item.src }}"
+        fstype: "{{ item.fstype }}"
+        opts: "{{ item.opts }}"
+        state: mounted
+      with_items:
+        - { path: '/home/rt/mount/pve4_data', src: '10.1.1.7:/data/pve4_data_nfs', fstype: 'nfs', opts: 'rw,sync,hard,intr' }
+        - { path: '/home/rt/mount/nfs-rt', src: '10.1.1.6:/mnt/pool-1-14t/rt', fstype: 'nfs', opts: 'rw,sync,hard,intr' }
+        - { path: '/home/rt/mount/nfs-file-01', src: '10.1.1.21:/datapool/nfs', fstype: 'nfs', opts: 'rw,sync,hard,intr' }        
+        - { path: '/home/rt/mount/bdp', src: '//10.1.1.6/big-dick-pool', fstype: 'cifs', opts: 'credentials=/home/rt/.smbcreds,uid=rt,gid=rt,file_mode=0755,dir_mode=0755' }
+        - { path: '/home/rt/mount/red', src: '//10.1.1.6/red-share', fstype: 'cifs', opts: 'credentials=/home/rt/.smbcreds,uid=rt,gid=rt,file_mode=0755,dir_mode=0755' }
+
+    - name: Test mount points
+      command: mountpoint -q "{{ item }}"
+      register: mount_test
+      failed_when: mount_test.rc not in [0, 1]
+      changed_when: false
+      with_items:
+        - /home/rt/mount/nfs-file-01
+        - /home/rt/mount/nfs-rt
+        - /home/rt/mount/bdp
+        - /home/rt/mount/red
+        - /home/rt/mount/pve4_data

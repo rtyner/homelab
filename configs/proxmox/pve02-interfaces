@@ -1,0 +1,52 @@
+auto lo
+iface lo inet loopback
+
+iface enp4s0 inet manual
+        mtu 9000
+
+iface enp5s0f3 inet manual
+
+auto enp66s0
+iface enp66s0 inet manual
+        mtu 9000
+
+iface eno1 inet manual
+
+iface eno2 inet manual
+
+iface eno3 inet manual
+
+iface idrac inet manual
+
+auto eno4
+iface eno4 inet manual
+
+iface enp5s0f0 inet manual
+
+iface enp5s0f1 inet manual
+
+iface enp5s0f2 inet manual
+
+auto vmbr0
+iface vmbr0 inet static
+        address 10.30.1.3/24
+        gateway 10.30.1.1
+        bridge-ports enp4s0
+        bridge-stp off
+        bridge-fd 0
+        mtu 9000
+
+auto vmbr1
+iface vmbr1 inet static
+        address 10.20.1.3/24
+        bridge-ports enp66s0
+        bridge-stp off
+        bridge-fd 0
+        mtu 9000
+
+auto vmbr2
+iface vmbr2 inet static
+        address 10.10.1.3/24
+        bridge-ports eno4
+        bridge-stp off
+        bridge-fd 0

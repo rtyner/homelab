@@ -1,0 +1,206 @@
+{
+        debug
+        email rusty@rtyner.com
+        acme_dns cloudflare {
+                api_token {env.CF_API_TOKEN}
+        }
+}
+
+pve1.rtyner.com {
+        reverse_proxy http://10.1.1.2:8006
+        tls {
+                dns cloudflare {env.CF_API_TOKEN}
+                resolvers 1.1.1.1
+        }
+}
+
+pve2.rtyner.com {
+        reverse_proxy http://10.1.1.4:8006
+        tls {
+                dns cloudflare {env.CF_API_TOKEN}
+                resolvers 1.1.1.1
+        }
+}
+
+pve3.rtyner.com {
+        reverse_proxy http://10.1.1.5:8006
+        tls {
+                dns cloudflare {env.CF_API_TOKEN}
+                resolvers 1.1.1.1
+        }
+}
+
+gitlab.rtyner.com {
+        reverse_proxy 10.1.1.27:80 {
+                header_up Host {host}
+        }
+}
+
+vault.rtyner.com {
+        reverse_proxy http://10.1.1.16:8200
+        tls {
+                dns cloudflare {env.CF_API_TOKEN}
+                resolvers 1.1.1.1
+        }
+}
+
+port.rtyner.com {
+        reverse_proxy http://10.1.1.16:9000
+        tls {
+                dns cloudflare {env.CF_API_TOKEN}
+                resolvers 1.1.1.1
+        }
+}
+
+ipam.rtyner.com {
+        reverse_proxy http://10.1.1.16:8013
+        tls {
+                dns cloudflare {env.CF_API_TOKEN}
+                resolvers 1.1.1.1
+        }
+}
+
+npm.rtyner.com {
+        reverse_proxy http://10.1.1.16:81
+        tls {
+                dns cloudflare {env.CF_API_TOKEN}
+                resolvers 1.1.1.1
+        }
+}
+
+home.rtyner.com {
+        reverse_proxy http://10.1.1.16:3091
+        tls {
+                dns cloudflare {env.CF_API_TOKEN}
+                resolvers 1.1.1.1
+        }
+}
+
+#grafana.rtyner.com {
+#        reverse_proxy http://10.1.1.22:3000
+#        tls {
+#                dns cloudflare {env.CF_API_TOKEN}
+#                resolvers 1.1.1.1
+#        }
+#}
+
+#prom.rtyner.com {
+#        reverse_proxy http://10.1.1.22:9090
+#        tls {
+#                dns cloudflare {env.CF_API_TOKEN}
+#                resolvers 1.1.1.1
+#        }
+#}
+
+s3.rtyner.com {
+        reverse_proxy http://10.1.1.17:9099
+        tls {
+                dns cloudflare {env.CF_API_TOKEN}
+                resolvers 1.1.1.1
+        }
+}
+
+nas.rtyner.com {
+        reverse_proxy http://10.1.1.6:80
+        tls {
+                dns cloudflare {env.CF_API_TOKEN}
+                resolvers 1.1.1.1
+        }
+}
+
+noco.rtyner.com {
+        reverse_proxy http://10.1.1.25:80
+        tls {
+                dns cloudflare {env.CF_API_TOKEN}
+                resolvers 1.1.1.1
+        }
+}
+
+fw.rtyner.com {
+        reverse_proxy http://10.1.1.1:80
+        tls {
+                dns cloudflare {env.CF_API_TOKEN}
+                resolvers 1.1.1.1
+        }
+}
+
+paper.rtyner.com {
+        reverse_proxy http://10.1.1.17:8000
+        tls {
+                dns cloudflare {env.CF_API_TOKEN}
+                resolvers 1.1.1.1
+        }
+}
+
+todo.rtyner.com {
+        reverse_proxy http://10.1.1.30:3456
+        tls {
+                dns cloudflare {env.CF_API_TOKEN}
+                resolvers 1.1.1.1
+        }
+}
+
+uptime.rtyner.com {
+    tls {
+        dns cloudflare {env.CF_API_TOKEN}
+        resolvers 1.1.1.1
+    }
+    reverse_proxy 10.1.1.100:80 {
+        header_up Host {host}
+    }
+}
+
+# Prometheus configuration
+prometheus.rtyner.com {
+    tls {
+        dns cloudflare {env.CF_API_TOKEN}
+        resolvers 1.1.1.1
+    }        
+    reverse_proxy 10.1.1.100:80 {
+        # Add health checks
+        health_uri /api/v1/query?query=up
+        health_interval 10s
+        # Handle errors gracefully
+        fail_duration 10s
+    }
+
+    # Basic security headers
+    header {
+        # Enable HSTS
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        # Prevent browsers from detecting the mimetype if not sent
+        X-Content-Type-Options "nosniff"
+        # Prevent your site from being embedded in iframes
+        X-Frame-Options "DENY"
+    }
+}
+
+# Grafana configuration
+grafana.rtyner.com {
+    tls {
+        dns cloudflare {env.CF_API_TOKEN}
+        resolvers 1.1.1.1
+    }        
+    reverse_proxy 10.1.1.100:80 {
+        # Add health checks
+        health_uri /api/health
+        health_interval 10s
+        # Handle errors gracefully
+        fail_duration 10s
+        # Handle websocket connections for live updates
+        header_up Host {http.request.host}
+        header_up X-Real-IP {http.request.remote}
+        header_up X-Forwarded-For {http.request.remote}
+        header_up X-Forwarded-Proto {http.request.scheme}
+    }
+
+    # Basic security headers
+    header {
+        # Enable HSTS
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        # Prevent browsers from detecting the mimetype if not sent
+        X-Content-Type-Options "nosniff"
+        # Allow Grafana to be embedded in iframes on the same origin
+        X-Frame-Options "SAMEORIGIN"
+    }
+}

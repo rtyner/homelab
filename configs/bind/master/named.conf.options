@@ -1,0 +1,24 @@
+acl "trusted" {
+        10.10.1.10;      #ns1
+        10.10.1.11;      #ns2
+        10.0.0.0/8;
+
+};
+options {
+        directory "/var/cache/bind";
+
+        recursion yes;
+        allow-recursion { trusted; };
+        allow-query { trusted; };
+        listen-on { 10.10.1.10; };
+        allow-transfer { 10.10.1.11; };
+        dnssec-validation no;
+        listen-on-v6 { none; };
+
+        forward only;
+        forwarders {
+                1.1.1.1;
+                8.8.8.8;
+};
+
+};

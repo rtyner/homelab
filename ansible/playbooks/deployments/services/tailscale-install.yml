@@ -1,0 +1,57 @@
+---
+- name: Deploy Tailscale
+  hosts: ubuntu
+  become: true
+  
+  vars:
+    tailscale_authkey: "{{ lookup('env', 'TAILSCALE_AUTH_KEY') }}"
+    tailscale_up_args: "--accept-routes --advertise-exit-node"
+
+  pre_tasks:
+    - name: Check if Tailscale is installed
+      command: which tailscale
+      register: tailscale_check
+      changed_when: false
+      failed_when: false
+
+    - name: Get Tailscale service status
+      service_facts:
+      when: tailscale_check.rc == 0
+
+    - name: Check Tailscale connection status
+      command: tailscale status
+      register: tailscale_status
+      changed_when: false
+      failed_when: false
+      when: tailscale_check.rc == 0
+
+    - name: Skip role if Tailscale is already running and connected
+      set_fact:
+        skip_tailscale_role: true
+      when: 
+        - tailscale_check.rc == 0
+        - "'tailscaled.service' in ansible_facts.services"
+        - "ansible_facts.services['tailscaled.service'].state == 'running'"
+        - "tailscale_status.rc == 0"
+        - "'Started' in tailscale_status.stdout"
+
+    - name: Verify auth key is set
+      fail:
+        msg: "TAILSCALE_AUTH_KEY environment variable is not set"
+      when: lookup('env', 'TAILSCALE_AUTH_KEY') == ''
+
+  roles:
+    - name: artis3n.tailscale
+      vars:
+        tailscale_up_skip: false
+        tailscale_accept_dns: true
+        tailscale_logout: false
+        tailscale_force_reauth: true  # Added to force reauthorization if needed
+      when: not skip_tailscale_role | default(false)
+
+  post_tasks:
+    - name: Ensure Tailscale is up
+      command: tailscale up {{ tailscale_up_args }}
+      when: 
+        - tailscale_check.rc == 0
+        - tailscale_status.rc != 0 or "'Started' not in tailscale_status.stdout"

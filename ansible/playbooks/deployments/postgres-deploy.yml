@@ -1,0 +1,120 @@
+---
+- name: Install and Configure PostgreSQL on Debian
+  hosts: all
+  become: yes
+  vars:
+    # ===== REQUIRED VARIABLES TO SET =====
+    postgres_db_name: "home_inventory"         # Replace with your database name
+    postgres_db_user: "rt"             # Replace with your database user
+    postgres_db_password: ""     # Replace with a secure password
+    postgres_dump_path: "./home_inventory_2025-01-11_0045.sql.gz"   # Replace with your dump file path
+    
+    # ===== OPTIONAL VARIABLES =====
+    postgres_version: 17                    # PostgreSQL version (adjust for your Debian)
+    postgres_enable_remote: true             # Set to true to allow remote connections
+    postgres_port: 5432                       # Default PostgreSQL port
+
+  tasks:
+    - name: Add PostgreSQL APT repository signing key
+      ansible.builtin.apt_key:
+        url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+        state: present
+  
+    - name: Add PostgreSQL APT repository
+      ansible.builtin.apt_repository:
+        repo: "deb http://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main"
+        state: present
+        filename: postgresql
+  
+    - name: Update APT cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Install PostgreSQL and dependencies
+      apt:
+        name: "postgresql-{{ postgres_version }}"
+        state: present
+        update_cache: yes
+
+    - name: Ensure PostgreSQL service is running
+      service:
+        name: postgresql
+        state: started
+        enabled: yes
+
+    - name: Install psycopg2 (via apt)
+      ansible.builtin.apt:
+        name: python3-psycopg2
+        state: present
+  
+    - name: Create PostgreSQL database user
+      become_user: postgres
+      community.postgresql.postgresql_user:
+        name: "{{ postgres_db_user }}"
+        password: "{{ postgres_db_password }}"
+        role_attr_flags: "SUPERUSER,CREATEDB"  # Adjust roles as needed
+        state: present
+
+    - name: Create PostgreSQL database
+      become_user: postgres
+      community.postgresql.postgresql_db:
+        name: "{{ postgres_db_name }}"
+        owner: "{{ postgres_db_user }}"
+        state: present
+
+    - name: Configure password authentication
+      ansible.builtin.lineinfile:
+        path: /etc/postgresql/{{ postgres_version }}/main/pg_hba.conf
+        regexp: '^local\s+all\s+all\s+peer'
+        line: 'local   all             all                                     md5'
+        backup: yes
+      notify: restart postgresql
+
+    - name: Import database dump
+      ansible.builtin.shell:
+        cmd: "psql -U {{ postgres_db_user }} -d {{ postgres_db_name }} -f {{ postgres_dump_path }}"
+      become_user: postgres
+      when: ansible_local.dump_file.stat.exists | default(false)
+      args:
+        executable: /bin/bash
+
+    - name: Check if dump file exists
+      ansible.builtin.stat:
+        path: "{{ postgres_dump_path }}"
+      register: dump_file
+      run_once: true
+
+    # ===== OPTIONAL REMOTE ACCESS =====
+    - name: Configure remote access
+      ansible.builtin.lineinfile:
+        path: /etc/postgresql/{{ postgres_version }}/main/postgresql.conf
+        regexp: '^#?listen_addresses = '
+        line: "listen_addresses = '*'"
+        backup: yes
+      when: postgres_enable_remote
+      notify: restart postgresql
+
+    - name: Install UFW (Uncomplicated Firewall)
+      ansible.builtin.apt:
+        name: ufw
+        state: present
+    
+    - name: Enable UFW
+      ansible.builtin.command: ufw enable
+      when: ansible_facts['os_family'] == 'Debian'
+      become: yes
+
+    - name: Open firewall port for PostgreSQL
+      ufw:
+        rule: allow
+        port: "{{ postgres_port }}"
+        proto: tcp
+      when: 
+        - postgres_enable_remote
+        - ansible_os_family == 'Debian'
+
+  handlers:
+    - name: restart postgresql
+      service:
+        name: postgresql
+        state: restarted

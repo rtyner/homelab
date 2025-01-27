@@ -1,0 +1,49 @@
+; File: /var/lib/coredns/reverse/1.1.10.in-addr.arpa
+$ORIGIN 1.1.10.in-addr.arpa.
+$TTL 604800
+@       IN SOA  dns-prod-01.local.rtyner.com. dns.rtyner.com. (
+                2024122614 ; serial
+                43200      ; refresh (12h)
+                900       ; retry (15m)
+                1814400   ; expire (3w)
+                7200      ; minimum (2h)
+)
+        IN NS   dns-prod-01.local.rtyner.com.
+        IN NS   dns-prod-02.local.rtyner.com.
+
+1       IN PTR  prod-fw-01.local.rtyner.com.
+2       IN PTR  prod-pve-01.local.rtyner.com.
+4       IN PTR  prod-pve-02.local.rtyner.com.
+5       IN PTR  prod-pve-03.local.rtyner.com.
+6       IN PTR  truenas.local.rtyner.com.
+14      IN PTR  prod-backup-01.local.rtyner.com.
+15      IN PTR  prod-pg-01.local.rtyner.com.
+16      IN PTR  prod-docker-01.local.rtyner.com.
+16      IN PTR  ipam.local.rtyner.com.
+16      IN PTR  port.local.rtyner.com.
+17      IN PTR  prod-docker-02.local.rtyner.com.
+17      IN PTR  minio.local.rtyner.com.
+18      IN PTR  prod-pg-02.local.rtyner.com.
+19      IN PTR  dev-ollama-01.local.rtyner.com.
+20      IN PTR  dev-arch-01.local.rtyner.com.
+21      IN PTR  prod-file-01.local.rtyner.com.
+22      IN PTR  prod-monitor-01.local.rtyner.com.
+23      IN PTR  prod-pg-03.local.rtyner.com.
+25      IN PTR  prod-nocodb-01.local.rtyner.com.
+26      IN PTR  prod-caddy-01.local.rtyner.com.
+26      IN PTR  vault.rtyner.com.
+50      IN PTR  prod-k3s-cls01-master-01.local.rtyner.com.
+51      IN PTR  prod-k3s-cls01-master-02.local.rtyner.com.
+52      IN PTR  prod-k3s-cls01-master-03.local.rtyner.com.
+53      IN PTR  prod-k3s-cls01-worker-01.local.rtyner.com.
+54      IN PTR  prod-k3s-cls01-worker-02.local.rtyner.com.
+55      IN PTR  prod-k3s-cls01-worker-03.local.rtyner.com.
+56      IN PTR  prod-k3s-cls01-worker-04.local.rtyner.com.
+57      IN PTR  prod-k3s-cls01-worker-05.local.rtyner.com.
+96      IN PTR  dns-prod-01.local.rtyner.com.
+97      IN PTR  dns-prod-02.local.rtyner.com.
+98      IN PTR  prod-dns-01.local.rtyner.com.
+99      IN PTR  prod-dns-02.local.rtyner.com.
+100     IN PTR  rancher.local.rtyner.com.
+222     IN PTR  pve01-idrac.local.rtyner.com.
+253     IN PTR  core-sw01.local.rtyner.com.

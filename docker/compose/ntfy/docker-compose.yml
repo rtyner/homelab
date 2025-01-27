@@ -1,0 +1,23 @@
+version: '3'
+services:
+  ntfy:
+    image: binwiederhier/ntfy
+    restart: unless-stopped
+    environment:
+      NTFY_BASE_URL: http://ntfy.rtyner.com
+      NTFY_CACHE_FILE: /var/lib/ntfy/cache.db
+      NTFY_AUTH_FILE: /var/lib/ntfy/auth.db
+      NTFY_AUTH_DEFAULT_ACCESS: deny-all
+      NTFY_BEHIND_PROXY: true
+      NTFY_ATTACHMENT_CACHE_DIR: /var/lib/ntfy/attachments
+      NTFY_ENABLE_LOGIN: true
+      NTFY_UPSTREAM_BASE_URL: https://ntfy.sh
+      NTFY_WEB_PUSH_PUBLIC_KEY: 
+      NTFY_WEB_PUSH_PRIVATE_KEY:
+      NTFY_WEB_PUSH_FILE: /var/lib/ntfy/webpush.db
+      NTFY_WEB_PUSH_EMAIL_ADDRESS: homelab@rtyner.com
+    volumes:
+      - ./:/var/lib/ntfy
+    ports:
+      - 8081:80
+    command: serve

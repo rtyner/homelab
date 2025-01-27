@@ -1,0 +1,295 @@
+---
+- name: Base Config
+  hosts: debian
+  vars:
+    ansible_command_timeout: 300
+    ansible_timeout: 300
+  become: true
+
+  handlers:
+    - name: restart ssh
+      service:
+        name: ssh
+        state: restarted
+
+    - name: restart node_exporter
+      service:
+        name: node_exporter
+        state: restarted      
+
+    - name: Clear shell cache
+      command: hash -r
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: yes
+
+    - name: nopasswd sudo
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        backup: yes
+        regexp: '^%sudo'
+        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+        
+    - name: disable root login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        backup: yes        
+        regexp: '^PermitRootLogin'
+        line: "PermitRootLogin no"
+      notify: restart ssh
+  
+    - name: standard packages
+      apt:
+        pkg: 
+          - vim
+          - bat
+          - git
+          - gpg
+          - htop
+          - curl
+          - unzip
+          - rsync
+          - rclone
+          - dnsutils
+          - python3-pip
+          - build-essential
+          - python3-setuptools
+        state: present
+        update_cache: yes
+
+    - name: Install NFS client
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+          - nfs-common
+          - cifs-utils
+
+    - name: Create .smbcreds file from template
+      template:
+        src: smbcreds.j2
+        dest: /home/rt/.smbcreds
+        mode: '0600'
+        owner: rt
+        group: rt
+      no_log: true
+
+    - name: Create mount directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: rt
+        group: rt
+        mode: '0755'
+        recurse: yes
+      with_items:
+        - /home/rt/mount/shares
+
+
+    - name: Configure fstab entries
+      blockinfile:
+        path: /etc/fstab
+        backup: yes
+        block: |
+          //10.20.1.5/shares /home/rt/mount/shares cifs credentials=/home/rt/.smbcreds,uid=rt,gid=rt,file_mode=0755,dir_mode=0755 0 0
+
+    - name: Mount all shares
+      ansible.posix.mount:
+        path: "{{ item.path }}"
+        src: "{{ item.src }}"
+        fstype: "{{ item.fstype }}"
+        opts: "{{ item.opts }}"
+        state: mounted
+      with_items:     
+        - { path: '/home/rt/mount/shares', src: '//10.1.1.8/shares', fstype: 'cifs', opts: 'credentials=/home/rt/.smbcreds,uid=rt,gid=rt,file_mode=0755,dir_mode=0755' }
+
+    - name: Test mount points
+      command: mountpoint -q "{{ item }}"
+      register: mount_test
+      failed_when: mount_test.rc not in [0, 1]
+      changed_when: false
+      with_items:
+        - /home/rt/mount/shares
+
+    - name: Create node_exporter user
+      user:
+        name: node_exporter
+        system: yes
+        shell: /usr/sbin/nologin
+
+    - name: Check if node exporter binary exists
+      stat:
+        path: /usr/local/bin/node_exporter
+      register: node_exporter_binary
+
+    - name: Check if node exporter service exists
+      stat:
+        path: /etc/systemd/system/node_exporter.service
+      register: node_exporter_service
+
+    - name: Download and extract node exporter
+      unarchive:
+        src: https://github.com/prometheus/node_exporter/releases/download/v1.7.0/node_exporter-1.7.0.linux-amd64.tar.gz
+        dest: /usr/local/bin
+        remote_src: yes
+      when: not node_exporter_binary.stat.exists
+
+    - name: Move node exporter binary
+      copy:
+        src: /usr/local/bin/node_exporter-1.7.0.linux-amd64/node_exporter
+        dest: /usr/local/bin/node_exporter
+        remote_src: yes
+        mode: '0755'
+      when: not node_exporter_binary.stat.exists
+
+    - name: Create node exporter service
+      copy:
+        dest: /etc/systemd/system/node_exporter.service
+        content: |
+          [Unit]
+          Description=Node Exporter
+          After=network.target
+          
+          [Service]
+          Type=simple
+          User=node_exporter
+          ExecStart=/usr/local/bin/node_exporter
+          
+          [Install]
+          WantedBy=multi-user.target
+      when: not node_exporter_service.stat.exists
+      notify: restart node_exporter
+
+    - name: Start and enable node_exporter service
+      systemd:
+        name: node_exporter
+        state: started
+        enabled: yes
+        daemon_reload: yes
+
+    - name: Install QEMU guest agent
+      package:
+        name: qemu-guest-agent
+        state: present
+    
+    - name: Enable and start QEMU guest agent service
+      systemd:
+        name: qemu-guest-agent
+        enabled: yes
+        state: started
+
+    - name: Create a new regular user with sudo privileges
+      user:
+        name: rt
+        state: present
+        groups: sudo
+        append: true
+        create_home: true
+        
+    - name: Install unattended-upgrades package
+      apt:
+        name: unattended-upgrades
+        state: present
+
+    - name: Enable automatic updates
+      debconf:
+        name: unattended-upgrades
+        question: unattended-upgrades/enable_auto_updates
+        vtype: boolean
+        value: 'true'
+
+    - name: Configure unattended-upgrades
+      lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: '^//Unattended-Upgrade::Allowed-Origins', line: 'Unattended-Upgrade::Allowed-Origins { "${distro_id}:${distro_codename}"; "${distro_id}:${distro_codename}-security"; };' }
+        - { regexp: '^//Unattended-Upgrade::Mail "root"', line: 'Unattended-Upgrade::Mail "root@localhost";' }
+        - { regexp: '^//Unattended-Upgrade::Automatic-Reboot "false";', line: 'Unattended-Upgrade::Automatic-Reboot "true";' }
+        - { regexp: '^//Unattended-Upgrade::Remove-Unused-Dependencies "false";', line: 'Unattended-Upgrade::Remove-Unused-Dependencies "true";' }
+
+    - name: Ensure unattended-upgrades service is running
+      service:
+        name: unattended-upgrades
+        state: started
+        enabled: yes
+
+    - name: bashrc
+      get_url: 
+        url: https://raw.githubusercontent.com/rtyner/homelab/refs/heads/main/configs/.bashrc
+        dest: /home/rt
+
+    - name: Deploy and Configure Tailscale
+      block:
+        - name: Check if Tailscale is installed
+          command: which tailscale
+          register: tailscale_check
+          changed_when: false
+          failed_when: false
+    
+        - name: Get Tailscale service status
+          service_facts:
+          when: tailscale_check.rc == 0
+    
+        - name: Check Tailscale connection status
+          command: tailscale status
+          register: tailscale_status
+          changed_when: false
+          failed_when: false
+          when: tailscale_check.rc == 0
+    
+        - name: Skip role if Tailscale is already running and connected
+          set_fact:
+            skip_tailscale_role: true
+          when: 
+            - tailscale_check.rc == 0
+            - "'tailscaled.service' in ansible_facts.services"
+            - "ansible_facts.services['tailscaled.service'].state == 'running'"
+            - "tailscale_status.rc == 0"
+            - "'Started' in tailscale_status.stdout"
+    
+        - name: Verify auth key is set
+          fail:
+            msg: "TAILSCALE_KEY environment variable is not set"
+          when: lookup('env', 'TAILSCALE_KEY') == ''
+    
+        - name: Set Tailscale arguments
+          set_fact:
+            tailscale_up_args: "--accept-routes --advertise-exit-node"
+    
+        - name: Include Tailscale role
+          include_role:
+            name: artis3n.tailscale
+          vars:
+            tailscale_up_skip: false
+            tailscale_accept_dns: true
+            tailscale_logout: false
+            tailscale_force_reauth: true
+            tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
+            tailscale_up_args: "{{ tailscale_up_args }}"
+          when: not skip_tailscale_role | default(false)
+    
+        - name: Ensure Tailscale is up
+          command: "tailscale up {{ tailscale_up_args }}"
+          when: 
+            - tailscale_check is defined
+            - tailscale_check.rc == 0
+            - (tailscale_status.rc != 0 or "'Started' not in tailscale_status.stdout")
+      become: true
+
+    - name: Reboot the system
+      reboot:
+        msg: "System is being rebooted after successful configuration"
+        reboot_timeout: 300  

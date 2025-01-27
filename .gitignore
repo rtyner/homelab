@@ -1,0 +1,69 @@
+# terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+*.auto.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+crash.log
+crash.*.log
+
+# ansible
+vault.yml
+*.vault
+secrets.yml
+ansible.log
+ansible/facts_cache/
+smbcreds.j2
+
+# SSH Keys and Certificates
+*.pem
+*.key
+*.pub
+id_*
+known_hosts
+authorized_keys
+
+# Credentials and Secrets
+*.password
+*.pwd
+*secret*
+*private*
+*key*
+*token*
+*api*
+*pass*
+*auth*
+.env*
+*.env
+*smbcreds*
+credentials.yml
+*credentials*
+
+# KVM/QEMU/libvirt
+*.qcow2
+*.img
+*.iso
+*.vmdk
+*.vdi
+*.raw
+.libvirt/
+
+# Backup files
+*.bak
+*.backup
+*-backup
+
+# Certificate files
+*.crt
+*.cert
+*.csr
+*.p12
+*.pfx
+
+# MacOS
+.DS_Store

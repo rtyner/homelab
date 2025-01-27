@@ -1,0 +1,240 @@
+Building configuration...
+
+Current configuration : 5713 bytes
+!
+version 12.2
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname acc-sw01
+!
+boot-start-marker
+boot-end-marker
+!
+enable secret 5 
+!
+username rt privilege 15 password 7 
+!
+!
+no aaa new-model
+system mtu routing 1500
+no ip domain-lookup
+ip domain-name local.rtynerlabs.io
+!
+!
+!
+!
+crypto pki trustpoint TP-self-signed-1526553728
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1526553728
+ revocation-check none
+ rsakeypair TP-self-signed-1526553728
+!
+!
+crypto pki certificate chain TP-self-signed-1526553728
+ certificate self-signed 01
+  30820256 308201BF A0030201 02020101 300D0609 2A864886 F70D0101 04050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 31353236 35353337 3238301E 170D3933 30333031 30303033
+  34355A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 35323635
+  35333732 3830819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  8100D645 88C07D6D 266183EE D4347A93 7B313BC8 D74B1D7B 6B2B0C69 79692797
+  1F7B744E 0799A289 E4D40CFB 3EAB47B8 811E28BE F11CAD19 F2FD6DA7 E479E99A
+  3C2C712E 8803C6F9 BCB19376 8FB6C4C3 C677CE61 130BDDF7 ACF07227 1A577486
+  0ECE15B1 343EEFCB 038F9672 58D5AA60 E44063E9 77CEE496 715690F6 C213667C
+  40FD0203 010001A3 7E307C30 0F060355 1D130101 FF040530 030101FF 30290603
+  551D1104 22302082 1E636F72 652D7377 2D30312E 6C6F6361 6C2E7274 796E6572
+  6C616273 2E696F30 1F060355 1D230418 30168014 FA339FE2 8EFD2A96 5FE00245
+  E783684A 8D95920E 301D0603 551D0E04 160414FA 339FE28E FD2A965F E00245E7
+  83684A8D 95920E30 0D06092A 864886F7 0D010104 05000381 81005CA7 C1D2ECEF
+  58E0A4DA BDFC8082 9A93D88C 41219DA8 280ECCAE 3823F053 6E272AF7 A2AA9240
+  D7587706 F23320D5 DE9849F7 027B8121 8BC06913 EF4D8872 632622FF 678A83E6
+  F44AEAF7 D9AE510C 497DCF41 C4CBD27B A9E15A6A 442C8A52 8F809043 CBC47798
+  07F5807D 67E8CB34 F613A981 E24577C9 41D126F8 1C4B0863 ADE6
+  quit
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+ip ssh version 2
+!
+!
+interface GigabitEthernet0/1
+ description proxmox host 1 port 1
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/2
+ description truenas port 1
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/3
+ description proxmox host 1  port 3
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/4
+ description access point 1
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/5
+ description desktop
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/6
+ description proxmox host 2 port 1
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/7
+ description proxmox host 1 port 4
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/8
+ description proxmox host 1 idrac
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/9
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/10
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/11
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/12
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/13
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/14
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/15
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/16
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/17
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/18
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/19
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/20
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/21
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/22
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/23
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/24
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/25
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/26
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/27
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface GigabitEthernet0/28
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface Vlan1
+ ip address 10.1.1.254 255.255.255.0
+!
+ip classless
+ip http server
+ip http secure-server
+!
+!
+vstack
+!
+line con 0
+ logging synchronous
+line vty 0 4
+ logging synchronous
+ login local
+ transport input telnet ssh
+line vty 5 14
+ logging synchronous
+ login local
+ transport input telnet ssh
+line vty 15
+ login
+!
+end
