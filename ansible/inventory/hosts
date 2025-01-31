@@ -29,6 +29,8 @@ k3s-worker05 ansible_host=k3s-prod-worker-05.local.rtyner.com.
 k3s-worker06 ansible_host=k3s-prod-worker-06.local.rtyner.com.
 caddy ansible_host=caddy-prod-01.local.rtyner.com.
 aptcache ansible_host=aptcache-prod-01.local.rtyner.com.
+hzdocker1 ansible_host=hz-e1-dk-prod-01.rtyner.com
+5.161.241.15
 
 [pve]
 pbs01 ansible_host=pbs-prod-01.local.rtyner.com.
@@ -62,10 +64,17 @@ k3s-worker05 ansible_host=k3s-prod-worker-05.local.rtyner.com.
 k3s-worker06 ansible_host=k3s-prod-worker-06.local.rtyner.com.
 caddy ansible_host=caddy-prod-01.local.rtyner.com.
 aptcache ansible_host=aptcache-prod-01.local.rtyner.com.
+hzdocker1 ansible_host=hz-e1-dk-prod-01.rtyner.com
+5.161.241.15
+
+[hetzner]
+5.161.241.15 ansible_user=root
 
 [docker]
 docker01 ansible_host=docker-prod-01.local.rtyner.com.
 docker02 ansible_host=docker-prod-02.local.rtyner.com.
+hzdocker1 ansible_host=hz-e1-dk-prod-01.rtyner.com
+5.161.241.15
 
 [network]
 
