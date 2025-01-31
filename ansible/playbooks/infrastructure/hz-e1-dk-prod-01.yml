@@ -1,0 +1,340 @@
+---
+- name: Base Config
+  hosts: hetzner
+  vars:
+    ansible_command_timeout: 300
+    ansible_timeout: 300
+  become: true
+
+  handlers:
+    - name: restart ssh
+      service:
+        name: ssh
+        state: restarted
+
+    - name: restart node_exporter
+      service:
+        name: node_exporter
+        state: restarted      
+
+    - name: Clear shell cache
+      command: hash -r
+
+    - name: restart fail2ban
+      service:
+        name: fail2ban
+        state: restarted
+
+    - name: restart docker
+      service:
+        name: docker
+        state: restarted      
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: yes
+
+    - name: Create a new regular user with sudo privileges
+      user:
+        name: gMtCALiiqak9GYGZA3cAUobM
+        state: present
+        groups: sudo
+        append: true
+        create_home: true
+        shell: /bin/bash
+        
+    - name: Set up authorized key for remote access
+      block:
+        - name: Ensure .ssh directory exists
+          file:
+            path: "/home/gMtCALiiqak9GYGZA3cAUobM/.ssh"
+            state: directory
+            mode: '0700'
+            owner: gMtCALiiqak9GYGZA3cAUobM
+            group: gMtCALiiqak9GYGZA3cAUobM
+    
+        - name: Add authorized key
+          authorized_key:
+            user: gMtCALiiqak9GYGZA3cAUobM
+            state: present
+            key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIITrPYcULQ4WTZs65pFDiSFS1hdsjVRo4DK+02pnRlYc"
+
+    - name: disable root login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        backup: yes        
+        regexp: '^PermitRootLogin'
+        line: "PermitRootLogin no"
+      notify: restart ssh
+
+    - name: Disable SSH password authentication
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        regexp: '^#?PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+      notify: restart ssh
+
+    - name: Install UFW
+      apt:
+        name: ufw
+        state: present
+
+    - name: Enable UFW firewall
+      ufw:
+        state: enabled
+        policy: deny
+        direction: incoming
+
+    - name: Allow SSH through UFW
+      ufw:
+        rule: allow
+        port: 22
+        proto: tcp
+
+    - name: Allow HTTP and HTTPS through UFW
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      with_items:
+        - 80
+        - 443      
+  
+    - name: standard packages
+      apt:
+        pkg: 
+          - vim
+          - bat
+          - git
+          - gpg
+          - htop
+          - curl
+          - unzip
+          - rsync
+          - rclone
+          - dnsutils
+          - fail2ban
+          - python3-pip
+          - build-essential
+          - python3-setuptools
+        state: present
+        update_cache: yes
+
+    - name: Configure Fail2Ban
+      copy:
+        dest: /etc/fail2ban/jail.local
+        content: |
+          [DEFAULT]
+          bantime = 1h
+          findtime = 10m
+          maxretry = 5
+          [sshd]
+          enabled = true
+      notify: restart fail2ban
+
+    - name: Enable and start Fail2Ban
+      service:
+        name: fail2ban
+        state: started
+        enabled: yes     
+
+    - name: Install Docker dependencies
+      apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+        state: present
+        update_cache: yes
+
+    - name: Install Docker
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+        update_cache: yes
+
+    - name: Start and enable Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add user to docker group
+      user:
+        name: gMtCALiiqak9GYGZA3cAUobM
+        groups: docker
+        append: yes
+
+    - name: Create node_exporter user
+      user:
+        name: node_exporter
+        system: yes
+        shell: /usr/sbin/nologin
+
+    - name: Check if node exporter binary exists
+      stat:
+        path: /usr/local/bin/node_exporter
+      register: node_exporter_binary
+
+    - name: Check if node exporter service exists
+      stat:
+        path: /etc/systemd/system/node_exporter.service
+      register: node_exporter_service
+
+    - name: Download and extract node exporter
+      unarchive:
+        src: https://github.com/prometheus/node_exporter/releases/download/v1.7.0/node_exporter-1.7.0.linux-amd64.tar.gz
+        dest: /usr/local/bin
+        remote_src: yes
+      when: not node_exporter_binary.stat.exists
+
+    - name: Move node exporter binary
+      copy:
+        src: /usr/local/bin/node_exporter-1.7.0.linux-amd64/node_exporter
+        dest: /usr/local/bin/node_exporter
+        remote_src: yes
+        mode: '0755'
+      when: not node_exporter_binary.stat.exists
+
+    - name: Create node exporter service
+      copy:
+        dest: /etc/systemd/system/node_exporter.service
+        content: |
+          [Unit]
+          Description=Node Exporter
+          After=network.target
+          
+          [Service]
+          Type=simple
+          User=node_exporter
+          ExecStart=/usr/local/bin/node_exporter
+          
+          [Install]
+          WantedBy=multi-user.target
+      when: not node_exporter_service.stat.exists
+      notify: restart node_exporter
+
+    - name: Start and enable node_exporter service
+      systemd:
+        name: node_exporter
+        state: started
+        enabled: yes
+        daemon_reload: yes
+        
+    - name: Install unattended-upgrades package
+      apt:
+        name: unattended-upgrades
+        state: present
+
+    - name: Enable automatic updates
+      debconf:
+        name: unattended-upgrades
+        question: unattended-upgrades/enable_auto_updates
+        vtype: boolean
+        value: 'true'
+
+    - name: Configure unattended-upgrades
+      lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: '^//Unattended-Upgrade::Allowed-Origins', line: 'Unattended-Upgrade::Allowed-Origins { "${distro_id}:${distro_codename}"; "${distro_id}:${distro_codename}-security"; };' }
+        - { regexp: '^//Unattended-Upgrade::Mail "root"', line: 'Unattended-Upgrade::Mail "root@localhost";' }
+        - { regexp: '^//Unattended-Upgrade::Automatic-Reboot "false";', line: 'Unattended-Upgrade::Automatic-Reboot "true";' } 
+        - { regexp: '^//Unattended-Upgrade::Remove-Unused-Dependencies "false";', line: 'Unattended-Upgrade::Remove-Unused-Dependencies "true";' }
+
+    - name: Ensure unattended-upgrades service is running
+      service:
+        name: unattended-upgrades
+        state: started     
+        enabled: yes
+
+    - name: bashrc
+      get_url: 
+        url: https://raw.githubusercontent.com/rtyner/homelab/refs/heads/main/configs/.bashrc
+        dest: /home/rt
+
+    - name: Deploy and Configure Tailscale
+      block:
+        - name: Check if Tailscale is installed
+          command: which tailscale
+          register: tailscale_check
+          changed_when: false
+          failed_when: false
+    
+        - name: Get Tailscale service status
+          service_facts:
+          when: tailscale_check.rc == 0
+    
+        - name: Check Tailscale connection status
+          command: tailscale status
+          register: tailscale_status
+          changed_when: false
+          failed_when: false
+          when: tailscale_check.rc == 0
+    
+        - name: Skip role if Tailscale is already running and connected
+          set_fact:
+            skip_tailscale_role: true
+          when: 
+            - tailscale_check.rc == 0
+            - "'tailscaled.service' in ansible_facts.services"
+            - "ansible_facts.services['tailscaled.service'].state == 'running'"
+            - "tailscale_status.rc == 0"
+            - "'Started' in tailscale_status.stdout"
+    
+        - name: Verify auth key is set
+          fail:
+            msg: "TAILSCALE_KEY environment variable is not set"
+          when: lookup('env', 'TAILSCALE_KEY') == ''
+    
+        - name: Set Tailscale arguments
+          set_fact:
+            tailscale_up_args: "--accept-routes --advertise-exit-node"
+    
+        - name: Include Tailscale role
+          include_role:
+            name: artis3n.tailscale
+          vars:
+            tailscale_up_skip: false
+            tailscale_accept_dns: true
+            tailscale_logout: false
+            tailscale_force_reauth: true
+            tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
+            tailscale_up_args: "{{ tailscale_up_args }}"
+          when: not skip_tailscale_role | default(false)
+    
+        - name: Ensure Tailscale is up
+          command: "tailscale up {{ tailscale_up_args }}"
+          when: 
+            - tailscale_check is defined
+            - tailscale_check.rc == 0
+            - (tailscale_status.rc != 0 or "'Started' not in tailscale_status.stdout")
+      become: true
+
+    - name: Reboot the system
+      reboot:
+        msg: "System is being rebooted after successful configuration"
+        reboot_timeout: 300  
