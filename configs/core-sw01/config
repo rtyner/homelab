@@ -21,7 +21,7 @@ vlan 5 name user by port
 !
 vlan 10 name data by port
  tagged ethe 1/1/48
- untagged ethe 1/1/5 to 1/1/12
+ untagged ethe 1/1/5 to 1/1/16
  router-interface ve 10
 !
 vlan 20 name storage by port
@@ -31,7 +31,7 @@ vlan 20 name storage by port
 !
 vlan 30 name cluster by port
  tagged ethe 1/1/48
- untagged ethe 1/1/44 ethe 1/2/2 ethe 1/2/4
+ untagged ethe 1/1/44 ethe 1/2/2 ethe 1/2/4 ethe 1/2/8
  router-interface ve 30
 !
 vlan 40 name management by port
@@ -108,15 +108,19 @@ manager port-list 987
 !
 !
 interface ethernet 1/1/1
+ port-name nas01 data
  no inline power
 !
 interface ethernet 1/1/2
+ port-name nas01 data
  no inline power
 !
 interface ethernet 1/1/3
+ port-name nas01 data
  no inline power
 !
 interface ethernet 1/1/4
+ port-name nas01 data
  no inline power
 !
 interface ethernet 1/1/5
@@ -152,15 +156,19 @@ interface ethernet 1/1/12
  no inline power
 !
 interface ethernet 1/1/13
+ port-name pve03 data
  no inline power
 !
 interface ethernet 1/1/14
+ port-name pve03 data
  no inline power
 !
 interface ethernet 1/1/15
+ port-name pve03 data
  no inline power
 !
 interface ethernet 1/1/16
+ port-name pve03 data
  no inline power
 !
 interface ethernet 1/1/17
@@ -188,12 +196,15 @@ interface ethernet 1/1/24
  no inline power
 !
 interface ethernet 1/1/25
+ port-name nas01 idrac
  no inline power
 !
 interface ethernet 1/1/26
+ port-name pve01 idrac
  no inline power
 !
 interface ethernet 1/1/27
+ port-name pve02 idrac
  no inline power
 !
 interface ethernet 1/1/28
@@ -258,6 +269,7 @@ interface ethernet 1/1/47
  no inline power
 !
 interface ethernet 1/1/48
+ port-name trunk to fw01
  no inline power
 !
 interface ethernet 1/2/1
@@ -283,6 +295,12 @@ interface ethernet 1/2/5
 interface ethernet 1/2/6
  port-name nas02 storage
  no optical-monitor
+!
+interface ethernet 1/2/7
+ port-name pve03 storage
+!
+interface ethernet 1/2/8
+ port-name pve03 cluster
 !
 interface ve 1
  ip address 10.1.1.251 255.255.255.0
