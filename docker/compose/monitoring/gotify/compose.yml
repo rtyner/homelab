@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  gotify:
+    image: gotify/server
+    ports:
+      - 8081:80
+    environment:
+      GOTIFY_DEFAULTUSER_PASS: 'admin'
+      GOTIFY_PLUGINSDIR: data/plugins
+      TZ: "America/New_York"
+    volumes:
+      - './gotify_data:/app/data'

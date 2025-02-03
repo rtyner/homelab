@@ -1,0 +1,15 @@
+version: '3'
+services:
+  excalidraw:
+    image: excalidraw/excalidraw:latest
+    container_name: excalidraw
+    restart: unless-stopped
+    ports:
+      - "3072:80"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - excalidraw-storage:/opt/excalidraw-storage
+
+volumes:
+  excalidraw-storage:

@@ -12,7 +12,7 @@ local_user="rt"
 share_uri="//10.20.1.5/shares"
 share_mountpoint="/home/${local_user}/mount/shares"
 mount_username="$local_user"
-mount_password=""
+mount_password="bX9a369922"
 
 # Function to handle errors in sudoers modification
 handle_sudoers_error() {
@@ -55,7 +55,7 @@ packages=(
     jq yq diff-so-fancy lazygit meld ctags shellcheck
     nmap tcpdump mtr iperf wireshark-cli netcat socat sshfs openssh openvpn
     sysstat iotop atop strace lsof perf
-    ranger rclone neofetch neovim
+    ranger rclone neofetch neovim openvpn
 )
 pacman -S --noconfirm "${packages[@]}"
 
